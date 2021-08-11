@@ -2,7 +2,7 @@
   "Release": "1",
   "ConsulConfig": {
     "Host": "http://localhost:8500",
-    "ServiceName": "interaction_ms"
+    "ServiceName": "school_ms"
   },
   "Logging": {
     "LogLevel": {
