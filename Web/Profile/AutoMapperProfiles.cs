@@ -1,5 +1,5 @@
-
-
+using iread_school_ms.DataAccess.Data.Entity;
+using iread_school_ms.Web.Dto.AudioDto;
 
 namespace iread_school_ms.Web.Profile
 {
@@ -7,11 +7,8 @@ namespace iread_school_ms.Web.Profile
     {
         public AutoMapperProfile()
         {
-            // //Audio Mapper
-            // CreateMap<Audio, AudioDto>().ReverseMap();
-            // CreateMap<Audio, AudioCreateDto>().ReverseMap();
-            // CreateMap<Audio, AudioUpdateDto>().ReverseMap();
-
+            //Audio Mapper
+            CreateMap<School, SchoolDto>().ReverseMap();
         }
     }
 }
