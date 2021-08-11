@@ -12,7 +12,7 @@ ENV ConnectionStrings:DefaultConnection="Server=iread_mysql;Database=school_ms_d
 
 ENV ConsulConfig:Host="http://consul:8500"
 
-EXPOSE 5021
+EXPOSE 5022
 
 COPY ./publish .
 
