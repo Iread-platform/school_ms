@@ -17,7 +17,7 @@ variables:
   DOCKER_PASSWORD: "yazankassamcod@v!@"
   DOCKER_ORGANIZATION_NAME: "iread"
   DOCKER_IMAGE_NAME: "school_ms"
-  CONTAINER_PORT: "5021"
+  CONTAINER_PORT: "5022"
 
   
 build:
