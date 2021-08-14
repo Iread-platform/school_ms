@@ -25,6 +25,7 @@ namespace iread_school_ms.DataAccess.Data
 
         //entities
         public DbSet<School> Schools { get; set; }
+        public DbSet<SchoolManager> SchoolManagers { get; set; }
 
     }
 }
