@@ -3,10 +3,24 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace iread_school_ms.Migrations
 {
-    public partial class SchoolManager : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Schools",
+                columns: table => new
+                {
+                    SchoolId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schools", x => x.SchoolId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "SchoolManagers",
                 columns: table => new
@@ -37,6 +51,9 @@ namespace iread_school_ms.Migrations
         {
             migrationBuilder.DropTable(
                 name: "SchoolManagers");
+
+            migrationBuilder.DropTable(
+                name: "Schools");
         }
     }
 }

@@ -8,8 +8,8 @@ using iread_school_ms.DataAccess.Data;
 namespace iread_school_ms.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210814131435_SchoolManager")]
-    partial class SchoolManager
+    [Migration("20210815092532_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,12 @@ namespace iread_school_ms.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("SchoolId");
@@ -54,12 +59,17 @@ namespace iread_school_ms.Migrations
             modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.SchoolManager", b =>
                 {
                     b.HasOne("iread_school_ms.DataAccess.Data.Entity.School", "School")
-                        .WithMany()
+                        .WithMany("Managers")
                         .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("School");
+                });
+
+            modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.School", b =>
+                {
+                    b.Navigation("Managers");
                 });
 #pragma warning restore 612, 618
         }
