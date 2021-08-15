@@ -18,7 +18,7 @@ namespace iread_school_ms.DataAccess.Repository
 
         public async Task<Class> GetById(int id)
         {
-            return await _context.Classes.FirstOrDefaultAsync(a => a.ClassId == id);
+            return await _context.Classes.Include(c => c.School).SingleOrDefaultAsync(a => a.ClassId == id);
         }
 
         public void Insert(Class classObj)

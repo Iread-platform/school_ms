@@ -1,4 +1,5 @@
 using iread_school_ms.DataAccess.Data.Entity;
+using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.School;
 
 namespace iread_school_ms.Web.Profile
@@ -11,6 +12,9 @@ namespace iread_school_ms.Web.Profile
             CreateMap<School, SchoolDto>().ReverseMap();
             CreateMap<SchoolCreateDto, School>().ReverseMap();
             CreateMap<SchoolUpdateDto, School>().ReverseMap();
+
+            //Class Mapper
+            CreateMap<Class, ClassDto>().ReverseMap();
         }
     }
 }
