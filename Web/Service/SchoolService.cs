@@ -19,17 +19,9 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetSchoolRepo.GetById(id);
         }
 
-        public bool Insert(School school)
+        public void Insert(School school)
         {
-            try
-            {
-                _publicRepository.GetSchoolRepo.Insert(school);
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return false;
-            }
+            _publicRepository.GetSchoolRepo.Insert(school);
         }
 
         public void Delete(School school)

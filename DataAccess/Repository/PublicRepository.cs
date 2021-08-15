@@ -7,6 +7,7 @@ namespace iread_school_ms.DataAccess.Repository
     {
         private readonly AppDbContext _context;
         private ISchoolRepository _schoolRepository;
+        private IClassRepository _classRepository;
 
 
         public PublicRepository(AppDbContext context)
@@ -19,6 +20,13 @@ namespace iread_school_ms.DataAccess.Repository
             get
             {
                 return _schoolRepository ??= new SchoolRepository(_context);
+            }
+        }
+        public IClassRepository GetClassRepository
+        {
+            get
+            {
+                return _classRepository ??= new ClassRepository(_context);
             }
         }
     }

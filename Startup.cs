@@ -87,6 +87,7 @@ namespace iread_school_ms
             // Inject the public repository
             services.AddScoped<IPublicRepository, PublicRepository>();
             services.AddScoped<SchoolService>();
+            services.AddScoped<ClassService>();
 
             IMapper mapper = new MapperConfiguration(config =>
             {
