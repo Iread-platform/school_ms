@@ -6,6 +6,7 @@ using iread_school_ms.Web.Service;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.Web.Dto.School;
+using iread_school_ms.Web.Util;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -84,23 +85,23 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-        // //DELETE: api/interaction/audio/5/delete
-        // [HttpDelete("{id}/delete")]
-        // public IActionResult Delete([FromRoute] int id)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-        //     }
-        //     var audio = _audioService.GetById(id).Result;
-        //     if (audio == null)
-        //     {
-        //         return NotFound();
-        //     }
+        //DELETE: api/School/5/delete
+        [HttpDelete("{id}/delete")]
+        public IActionResult Delete([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            var school = _schoolService.GetById(id).Result;
+            if (school == null)
+            {
+                return NotFound();
+            }
 
-        //     _audioService.Delete(audio);
-        //     return NoContent();
-        // }
+            _schoolService.Delete(school);
+            return NoContent();
+        }
 
 
 

@@ -27,12 +27,10 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public void Delete(School school)
         {
-            var schoolToRemove = new School() { SchoolId = id };
-            _context.Schools.Attach(schoolToRemove);
-            _context.Schools.Remove(schoolToRemove);
-            _context.SaveChangesAsync();
+            _context.Schools.Remove(school);
+            _context.SaveChanges();
         }
 
         public bool Exists(int id)

@@ -34,7 +34,7 @@ namespace iread_school_ms.Web.Service
 
         public void Delete(School school)
         {
-            _publicRepository.GetSchoolRepo.Delete(school.SchoolId);
+            _publicRepository.GetSchoolRepo.Delete(school);
         }
 
         internal void Update(School schoolEntity, School oldSchool)

@@ -9,7 +9,7 @@ namespace iread_school_ms.DataAccess.Interface
 
         public void Insert(School audio);
 
-        public void Delete(int id);
+        public void Delete(School school);
 
         public bool Exists(int id);
 
