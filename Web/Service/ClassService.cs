@@ -41,9 +41,8 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetClassRepository.GetBySchool(schoolId);
         }
 
-        public void AddStudent(ClassMember studentMember)
+        public void AddMember(ClassMember studentMember)
         {
-            studentMember.ClassMembershipType = ClassMembershipType.Student.ToString();
             _publicRepository.GetClassMemberRepository.Insert(studentMember);
         }
     }

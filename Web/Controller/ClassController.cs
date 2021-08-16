@@ -12,6 +12,7 @@ using iread_school_ms.Web.Dto.User;
 using System;
 using iread_school_ms.Web.Dto.UserDto;
 using iread_identity_ms.DataAccess.Data.Type;
+using iread_school_ms.DataAccess.Data.Type;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -76,19 +77,45 @@ namespace iread_school_ms.Web.Controller
 
             ClassMember studentMember = _mapper.Map<ClassMember>(student);
             studentMember.ClassId = id;
-            ValidationLogicForAddStudent(studentMember);
+            studentMember.ClassMembershipType = ClassMembershipType.Student.ToString();
+            ValidationLogicForAddMember(studentMember);
 
             if (ModelState.ErrorCount != 0)
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
 
-            _classService.AddStudent(studentMember);
+            _classService.AddMember(studentMember);
 
             return NoContent();
         }
 
-        private void ValidationLogicForAddStudent(ClassMember student)
+
+
+        [HttpPut("{id}/add-teacher")]
+        public IActionResult AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
+        {
+            if (teacher == null)
+            {
+                return BadRequest();
+            }
+
+            ClassMember teacherMember = _mapper.Map<ClassMember>(teacher);
+            teacherMember.ClassId = id;
+            teacherMember.ClassMembershipType = ClassMembershipType.Teacher.ToString();
+            ValidationLogicForAddMember(teacherMember);
+
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _classService.AddMember(teacherMember);
+
+            return NoContent();
+        }
+
+        private void ValidationLogicForAddMember(ClassMember student)
         {
 
             UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{student.MemberId}/get").Result;
@@ -98,9 +125,9 @@ namespace iread_school_ms.Web.Controller
             }
             else
             {
-                if (user.Role != RoleTypes.Student.ToString())
+                if (user.Role != student.ClassMembershipType)
                 {
-                    ModelState.AddModelError("User", "User not student");
+                    ModelState.AddModelError("User", $"User not {student.ClassMembershipType}");
                 }
                 else
                 {
