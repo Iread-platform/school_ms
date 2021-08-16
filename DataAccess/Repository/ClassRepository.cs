@@ -17,9 +17,19 @@ namespace iread_school_ms.DataAccess.Repository
             _context = context;
         }
 
-        public async Task<Class> GetById(int id)
+        public async Task<Class> GetById(int id, bool includeMambers)
         {
-            return await _context.Classes.Include(c => c.School).SingleOrDefaultAsync(a => a.ClassId == id);
+            if (includeMambers)
+                return await _context.Classes
+                .Include(c => c.School)
+                .Include(c => c.Members)
+                .SingleOrDefaultAsync(a => a.ClassId == id);
+
+            return await _context.Classes
+                .Include(c => c.School)
+                .SingleOrDefaultAsync(a => a.ClassId == id);
+
+
         }
 
 

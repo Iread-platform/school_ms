@@ -20,7 +20,7 @@ namespace iread_school_ms.DataAccess.Data.Entity
         [Required(AllowEmptyStrings = false)]
         public string LastName { get; set; }
 
-        public int MemberId { get; set; }
+        public string MemberId { get; set; }
 
         [Required]
         [EnumDataType(typeof(ClassMembershipType), ErrorMessage = "{} value not valid, should be one of [Teacher, Student]")]

@@ -8,6 +8,10 @@ using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.Web.Dto.School;
 using iread_school_ms.Web.Util;
 using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.User;
+using System;
+using iread_school_ms.Web.Dto.UserDto;
+using iread_identity_ms.DataAccess.Data.Type;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -34,7 +38,7 @@ namespace iread_school_ms.Web.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            Class classObj = await _classService.GetById(id);
+            Class classObj = await _classService.GetById(id, true);
 
             if (classObj == null)
             {
@@ -62,65 +66,103 @@ namespace iread_school_ms.Web.Controller
         // }
 
 
-        // [HttpPut("{id}/update")]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public IActionResult Update([FromBody] SchoolUpdateDto school, [FromRoute] int id)
-        // {
-        //     if (school == null)
-        //     {
-        //         return BadRequest();
-        //     }
+        [HttpPut("{id}/add-student")]
+        public IActionResult AddStudent([FromBody] StudentDto student, [FromRoute] int id)
+        {
+            if (student == null)
+            {
+                return BadRequest();
+            }
 
-        //     School oldSchool = _schoolService.GetById(id).Result;
-        //     if (oldSchool == null)
-        //     {
-        //         return NotFound();
-        //     }
+            ClassMember studentMember = _mapper.Map<ClassMember>(student);
+            studentMember.ClassId = id;
+            ValidationLogicForAddStudent(studentMember);
 
-        //     School schoolEntity = _mapper.Map<School>(school);
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
 
-        //     schoolEntity.SchoolId = id;
-        //     _schoolService.Update(schoolEntity, oldSchool);
+            _classService.AddStudent(studentMember);
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
+
+        private void ValidationLogicForAddStudent(ClassMember student)
+        {
+
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{student.MemberId}/get").Result;
+            if (user == null)
+            {
+                ModelState.AddModelError("User", "User not found");
+            }
+            else
+            {
+                if (user.Role != RoleTypes.Student.ToString())
+                {
+                    ModelState.AddModelError("User", "User not student");
+                }
+                else
+                {
+                    student.FirstName = user.FirstName;
+                    student.LastName = user.LastName;
+                }
+
+            }
+
+            Class classObj = _classService.GetById((int)student.ClassId, true).Result;
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
+            }
+            else
+            {
+                if (classObj.Members.Find(m => m.MemberId == student.MemberId) != null)
+                {
+                    ModelState.AddModelError("Member", "User already exists in this class");
+                }
+
+            }
+        }
 
 
-        // //DELETE: api/School/5/delete
-        // [HttpDelete("{id}/delete")]
-        // public IActionResult Delete([FromRoute] int id)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-        //     }
-        //     var school = _schoolService.GetById(id).Result;
-        //     if (school == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     _schoolService.Delete(school);
-        //     return NoContent();
-        // }
-
-
-
-        // private void ValidationLogicForUpdating(Audio audio)
-        // {
-        //     AttachmentDTO attachmentDto = _consulHttpClient.GetAsync<AttachmentDTO>("attachment_ms", $"/api/Attachment/get/{audio.AttachmentId}").Result;
-
-        //     if (attachmentDto == null || attachmentDto.Id < 1)
-        //     {
-        //         ModelState.AddModelError("AudioId", "Attachment not found");
-        //     }
-        //     else
-        //     {
-        //         if (!AudioExtensions.All.Contains(attachmentDto.Extension.ToLower()))
-        //         {
-        //             ModelState.AddModelError("Audio", "Audio not have valid extension, should be one of [" + string.Join(",", AudioExtensions.All) + "]");
-        //         }
-        //     }
-        // }
     }
+
+
+    // //DELETE: api/School/5/delete
+    // [HttpDelete("{id}/delete")]
+    // public IActionResult Delete([FromRoute] int id)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+    //     }
+    //     var school = _schoolService.GetById(id).Result;
+    //     if (school == null)
+    //     {
+    //         return NotFound();
+    //     }
+
+    //     _schoolService.Delete(school);
+    //     return NoContent();
+    // }
+
+
+
+    // private void ValidationLogicForUpdating(Audio audio)
+    // {
+    //     AttachmentDTO attachmentDto = _consulHttpClient.GetAsync<AttachmentDTO>("attachment_ms", $"/api/Attachment/get/{audio.AttachmentId}").Result;
+
+    //     if (attachmentDto == null || attachmentDto.Id < 1)
+    //     {
+    //         ModelState.AddModelError("AudioId", "Attachment not found");
+    //     }
+    //     else
+    //     {
+    //         if (!AudioExtensions.All.Contains(attachmentDto.Extension.ToLower()))
+    //         {
+    //             ModelState.AddModelError("Audio", "Audio not have valid extension, should be one of [" + string.Join(",", AudioExtensions.All) + "]");
+    //         }
+    //     }
+    // }
 }

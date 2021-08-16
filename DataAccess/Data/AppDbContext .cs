@@ -20,7 +20,10 @@ namespace iread_school_ms.DataAccess.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.Entity<Class>()
+                .HasMany(c => c.Members)
+                .WithOne(m => m.Class)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         //entities

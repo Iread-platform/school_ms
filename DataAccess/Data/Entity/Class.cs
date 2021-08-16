@@ -17,6 +17,7 @@ namespace iread_school_ms.DataAccess.Data.Entity
         [Required(AllowEmptyStrings = false)]
         public int SchoolId { get; set; }
         public School School { get; set; }
+        public List<ClassMember> Members { get; set; }
 
     }
 }

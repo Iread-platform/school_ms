@@ -8,8 +8,8 @@ using iread_school_ms.DataAccess.Data;
 namespace iread_school_ms.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210815095535_class")]
-    partial class @class
+    [Migration("20210816091824_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,8 +59,8 @@ namespace iread_school_ms.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("MemberId")
-                        .HasColumnType("int");
+                    b.Property<string>("MemberId")
+                        .HasColumnType("text");
 
                     b.HasKey("ClassMemberId");
 
@@ -110,7 +110,7 @@ namespace iread_school_ms.Migrations
             modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.Class", b =>
                 {
                     b.HasOne("iread_school_ms.DataAccess.Data.Entity.School", "School")
-                        .WithMany()
+                        .WithMany("Classes")
                         .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -121,7 +121,7 @@ namespace iread_school_ms.Migrations
             modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.ClassMember", b =>
                 {
                     b.HasOne("iread_school_ms.DataAccess.Data.Entity.Class", "Class")
-                        .WithMany()
+                        .WithMany("Members")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -140,8 +140,15 @@ namespace iread_school_ms.Migrations
                     b.Navigation("School");
                 });
 
+            modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.Class", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("iread_school_ms.DataAccess.Data.Entity.School", b =>
                 {
+                    b.Navigation("Classes");
+
                     b.Navigation("Managers");
                 });
 #pragma warning restore 612, 618

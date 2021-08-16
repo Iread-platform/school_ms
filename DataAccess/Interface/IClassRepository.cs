@@ -6,7 +6,7 @@ namespace iread_school_ms.DataAccess.Interface
 {
     public interface IClassRepository
     {
-        public Task<Class> GetById(int id);
+        public Task<Class> GetById(int id, bool includeMambers);
 
         public Task<List<Class>> GetBySchool(int schoolId);
 

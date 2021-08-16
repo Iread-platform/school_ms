@@ -94,7 +94,7 @@ namespace iread_school_ms.Web.Controller
         {
 
             School school = _schoolService.GetById(id, true).Result;
-            Class classObj = _classService.GetById(classId).Result;
+            Class classObj = _classService.GetById(classId, false).Result;
 
 
             if (school == null)

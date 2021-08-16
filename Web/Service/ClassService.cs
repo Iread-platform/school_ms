@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
+using iread_school_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Interface;
 
 namespace iread_school_ms.Web.Service
@@ -15,9 +16,9 @@ namespace iread_school_ms.Web.Service
             _publicRepository = publicRepository;
         }
 
-        public async Task<Class> GetById(int id)
+        public async Task<Class> GetById(int id, bool includeMambers)
         {
-            return await _publicRepository.GetClassRepository.GetById(id);
+            return await _publicRepository.GetClassRepository.GetById(id, includeMambers);
         }
 
         public void Insert(Class classObj)
@@ -38,6 +39,12 @@ namespace iread_school_ms.Web.Service
         public async Task<List<Class>> GetBySchool(int schoolId)
         {
             return await _publicRepository.GetClassRepository.GetBySchool(schoolId);
+        }
+
+        public void AddStudent(ClassMember studentMember)
+        {
+            studentMember.ClassMembershipType = ClassMembershipType.Student.ToString();
+            _publicRepository.GetClassMemberRepository.Insert(studentMember);
         }
     }
 }
