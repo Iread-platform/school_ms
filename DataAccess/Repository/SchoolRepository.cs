@@ -16,8 +16,11 @@ namespace iread_school_ms.DataAccess.Repository
             _context = context;
         }
 
-        public async Task<School> GetById(int id)
+        public async Task<School> GetById(int id, bool includeClasses)
         {
+            if (includeClasses)
+                return await _context.Schools.Include(s => s.Classes).FirstOrDefaultAsync(a => a.SchoolId == id);
+
             return await _context.Schools.FirstOrDefaultAsync(a => a.SchoolId == id);
         }
 
@@ -27,12 +30,10 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public void Delete(School school)
         {
-            var schoolToRemove = new School() { SchoolId = id };
-            _context.Schools.Attach(schoolToRemove);
-            _context.Schools.Remove(schoolToRemove);
-            _context.SaveChangesAsync();
+            _context.Schools.Remove(school);
+            _context.SaveChanges();
         }
 
         public bool Exists(int id)

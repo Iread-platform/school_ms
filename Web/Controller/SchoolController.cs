@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using iread_school_ms.Web.Util;
 using iread_interaction_ms.Web.Service;
 using iread_school_ms.Web.Service;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
-using iread_school_ms.Web.Dto.AudioDto;
+using iread_school_ms.Web.Dto.School;
+using iread_school_ms.Web.Util;
+using System.Collections.Generic;
+using iread_school_ms.Web.Dto.Class;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -17,12 +19,14 @@ namespace iread_school_ms.Web.Controller
     {
         private readonly IMapper _mapper;
         private readonly SchoolService _schoolService;
+        private readonly ClassService _classService;
         private readonly IConsulHttpClientService _consulHttpClient;
 
-        public SchoolController(SchoolService schoolService, IMapper mapper,
+        public SchoolController(SchoolService schoolService, ClassService classService, IMapper mapper,
           IConsulHttpClientService consulHttpClient)
         {
             _schoolService = schoolService;
+            _classService = classService;
             _mapper = mapper;
             _consulHttpClient = consulHttpClient;
         }
@@ -33,7 +37,7 @@ namespace iread_school_ms.Web.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            School school = await _schoolService.GetById(id);
+            School school = await _schoolService.GetById(id, true);
 
             if (school == null)
             {
@@ -44,141 +48,143 @@ namespace iread_school_ms.Web.Controller
         }
 
 
+        // GET: api/School/1/class/all
+        [HttpGet("{id}/class/all")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetClasses([FromRoute] int id)
+        {
+            var classes = await _classService.GetBySchool(id);
 
-        // // GET: api/interaction/audio/get-by-page/1
-        // [HttpGet("get-by-page/{pageId}")]
-        // [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public async Task<IActionResult> GetByPageId([FromRoute] int pageId)
-        // {
-        //     List<Audio> audios = await _audioService.GetByPageId(pageId);
+            if (classes == null)
+            {
+                return NotFound();
+            }
 
-        //     if (audios == null || !audios.Any())
-        //     {
-        //         return NotFound();
-        //     }
+            return Ok(_mapper.Map<List<InnerClassDto>>(classes));
+        }
 
-        //     return Ok(_mapper.Map<List<AudioDto>>(audios));
-        // }
+        // POST: api/School/1/class/add
+        [HttpPost("{id}/class/add")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AddClassToSchool([FromBody] ClassCreateDto classObj, [FromRoute] int id)
+        {
 
-        // //POST: api/audio/add
-        // [HttpPost("add")]
-        // [ProducesResponseType(StatusCodes.Status201Created)]
-        // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        // public async Task<IActionResult> Post([FromBody] AudioCreateDto audioCreateDto)
-        // {
-        //     if (audioCreateDto == null)
-        //     {
-        //         return BadRequest();
-        //     }
+            School school = _schoolService.GetById(id, false).Result;
 
-        //     Audio audioEntity = _mapper.Map<Audio>(audioCreateDto);
-        //     ValidationLogicForAdding(audioEntity);
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-        //     }
+            if (school == null)
+            {
+                ModelState.AddModelError("School", "School not found");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
 
-        //     if (!_audioService.Insert(audioEntity))
-        //     {
-        //         return BadRequest();
-        //     }
+            Class classEntity = _mapper.Map<Class>(classObj);
+            classEntity.SchoolId = id;
+            _classService.Insert(classEntity);
 
-        //     return CreatedAtAction("GetById", new { id = audioEntity.AudioId }, _mapper.Map<AudioDto>(audioEntity));
-        // }
+            return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
+        }
 
 
-        // [HttpPut("{id}/update")]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public IActionResult Update([FromBody] AudioUpdateDto audio, [FromRoute] int id)
-        // {
-        //     if (audio == null)
-        //     {
-        //         return BadRequest();
-        //     }
 
-        //     Audio oldAudio = _audioService.GetById(id).Result;
-        //     if (oldAudio == null)
-        //     {
-        //         return NotFound();
-        //     }
+        // DELETE: api/School/1/class/delete/1
+        [HttpDelete("{id}/class/delete/{classId}")]
+        public IActionResult Delete([FromRoute] int id, [FromRoute] int classId)
+        {
 
-        //     Audio audioEntity = _mapper.Map<Audio>(audio);
-        //     ValidationLogicForUpdating(audioEntity);
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-        //     }
-
-        //     audioEntity.AudioId = id;
-        //     _audioService.Update(audioEntity, oldAudio);
-        //     return NoContent();
-        // }
+            School school = _schoolService.GetById(id, true).Result;
+            Class classObj = _classService.GetById(classId, false).Result;
 
 
-        // //DELETE: api/interaction/audio/5/delete
-        // [HttpDelete("{id}/delete")]
-        // public IActionResult Delete([FromRoute] int id)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-        //     }
-        //     var audio = _audioService.GetById(id).Result;
-        //     if (audio == null)
-        //     {
-        //         return NotFound();
-        //     }
+            if (school == null)
+            {
+                ModelState.AddModelError("School", "School not found");
+            }
 
-        //     _audioService.Delete(audio);
-        //     return NoContent();
-        // }
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
+            }
 
-        // private void ValidationLogicForAdding(Audio audio)
-        // {
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            if (school.Classes.Find(c => c.ClassId == classObj.ClassId) == null)
+            {
+                ModelState.AddModelError("Class", "Class not related to this school");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
 
-        //     ViewStoryDto storyDto = _consulHttpClient.GetAsync<ViewStoryDto>("story_ms", $"/api/story/get/{audio.Interaction.StoryId}").Result;
+            _classService.Delete(classObj);
 
-        //     if (storyDto == null || storyDto.StoryId < 1)
-        //     {
-        //         ModelState.AddModelError("StoryId", "Story not found");
-        //     }
+            return NoContent();
+        }
 
-        //     AttachmentDTO attachmentDto = _consulHttpClient.GetAsync<AttachmentDTO>("attachment_ms", $"/api/Attachment/get/{audio.AttachmentId}").Result;
 
-        //     if (attachmentDto == null || attachmentDto.Id < 1)
-        //     {
-        //         ModelState.AddModelError("AudioId", "Attachment not found");
-        //     }
-        //     else
-        //     {
-        //         if (!AudioExtensions.All.Contains(attachmentDto.Extension.ToLower()))
-        //         {
-        //             ModelState.AddModelError("Audio", "Audio not have valid extension, should be one of [" + string.Join(",", AudioExtensions.All) + "]");
-        //         }
-        //     }
 
-        //     PageDto pageDto = _consulHttpClient.GetAsync<PageDto>("story_ms", $"/api/story/Page/get/{audio.Interaction.PageId}").Result;
+        //POST: api/School/add
+        [HttpPost("add")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult Post([FromBody] SchoolCreateDto schoolCreateDto)
+        {
+            if (schoolCreateDto == null)
+            {
+                return BadRequest();
+            }
 
-        //     if (pageDto == null || pageDto.PageId < 1)
-        //     {
-        //         ModelState.AddModelError("PageId", "Page not found");
-        //     }
+            School schoolEntity = _mapper.Map<School>(schoolCreateDto);
 
-        //     UserDto userDto = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/identity_ms/SysUsers/{audio.Interaction.StudentId}/get").Result;
+            _schoolService.Insert(schoolEntity);
+            return CreatedAtAction("GetById", new { id = schoolEntity.SchoolId }, _mapper.Map<SchoolDto>(schoolEntity));
+        }
 
-        //     if (userDto == null || string.IsNullOrEmpty(userDto.Id))
-        //     {
-        //         ModelState.AddModelError("StudentId", "Student not found");
-        //     }
-        //     else
-        //     {
-        //         if (!userDto.Role.Equals(RoleTypes.Student.ToString()))
-        //         {
-        //             ModelState.AddModelError("StudentId", "User not a student");
-        //         }
-        //     }
-        // }
+
+        [HttpPut("{id}/update")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult Update([FromBody] SchoolUpdateDto school, [FromRoute] int id)
+        {
+            if (school == null)
+            {
+                return BadRequest();
+            }
+
+            School oldSchool = _schoolService.GetById(id, false).Result;
+            if (oldSchool == null)
+            {
+                return NotFound();
+            }
+
+            School schoolEntity = _mapper.Map<School>(school);
+
+            schoolEntity.SchoolId = id;
+            _schoolService.Update(schoolEntity, oldSchool);
+
+            return NoContent();
+        }
+
+
+        //DELETE: api/School/5/delete
+        [HttpDelete("{id}/delete")]
+        public IActionResult Delete([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            var school = _schoolService.GetById(id, false).Result;
+            if (school == null)
+            {
+                return NotFound();
+            }
+
+            _schoolService.Delete(school);
+            return NoContent();
+        }
+
+
 
         // private void ValidationLogicForUpdating(Audio audio)
         // {

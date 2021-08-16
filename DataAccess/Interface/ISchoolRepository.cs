@@ -5,15 +5,14 @@ namespace iread_school_ms.DataAccess.Interface
 {
     public interface ISchoolRepository
     {
-        public Task<School> GetById(int id);
+        public Task<School> GetById(int id, bool includeClasses);
 
         public void Insert(School audio);
 
-        public void Delete(int id);
+        public void Delete(School school);
 
         public bool Exists(int id);
 
         public void Update(School schoolEntity, School oldSchool);
-
     }
 }

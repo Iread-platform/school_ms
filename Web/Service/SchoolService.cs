@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -14,27 +15,20 @@ namespace iread_school_ms.Web.Service
             _publicRepository = publicRepository;
         }
 
-        public async Task<School> GetById(int id)
+        public async Task<School> GetById(int id, bool includeClasses)
         {
-            return await _publicRepository.GetSchoolRepo.GetById(id);
+
+            return await _publicRepository.GetSchoolRepo.GetById(id, includeClasses);
         }
 
-        public bool Insert(School school)
+        public void Insert(School school)
         {
-            try
-            {
-                _publicRepository.GetSchoolRepo.Insert(school);
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return false;
-            }
+            _publicRepository.GetSchoolRepo.Insert(school);
         }
 
         public void Delete(School school)
         {
-            _publicRepository.GetSchoolRepo.Delete(school.SchoolId);
+            _publicRepository.GetSchoolRepo.Delete(school);
         }
 
         internal void Update(School schoolEntity, School oldSchool)
