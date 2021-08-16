@@ -17,6 +17,8 @@ namespace iread_school_ms.DataAccess.Data.Entity
         [Required(AllowEmptyStrings = false)]
         public string Location { get; set; }
         public List<SchoolManager> Managers { get; set; }
+        public List<Class> Classes { get; set; }
+
 
     }
 }

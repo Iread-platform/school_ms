@@ -37,7 +37,7 @@ namespace iread_school_ms.Web.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            School school = await _schoolService.GetById(id);
+            School school = await _schoolService.GetById(id, true);
 
             if (school == null)
             {
@@ -64,18 +64,63 @@ namespace iread_school_ms.Web.Controller
             return Ok(_mapper.Map<List<InnerClassDto>>(classes));
         }
 
-        // // POST: api/School/1/class/add
-        // [HttpPost("{id}/class/add")]
-        // [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public IActionResult AddClassToSchool([FromBody] ClassCreateDto classObj, [FromQuery] int id)
-        // {
-        //     Class classEntity = _mapper.Map<Class>(classObj);
-        //     classEntity.SchoolId = id;
-        //     _classService.Insert(classEntity);
+        // POST: api/School/1/class/add
+        [HttpPost("{id}/class/add")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AddClassToSchool([FromBody] ClassCreateDto classObj, [FromRoute] int id)
+        {
 
-        //     return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
-        // }
+            School school = _schoolService.GetById(id, false).Result;
+
+            if (school == null)
+            {
+                ModelState.AddModelError("School", "School not found");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            Class classEntity = _mapper.Map<Class>(classObj);
+            classEntity.SchoolId = id;
+            _classService.Insert(classEntity);
+
+            return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
+        }
+
+
+
+        // DELETE: api/School/1/class/delete/1
+        [HttpDelete("{id}/class/delete/{classId}")]
+        public IActionResult Delete([FromRoute] int id, [FromRoute] int classId)
+        {
+
+            School school = _schoolService.GetById(id, true).Result;
+            Class classObj = _classService.GetById(classId).Result;
+
+
+            if (school == null)
+            {
+                ModelState.AddModelError("School", "School not found");
+            }
+
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
+            }
+
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            if (school.Classes.Find(c => c.ClassId == classObj.ClassId) == null)
+            {
+                ModelState.AddModelError("Class", "Class not related to this school");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _classService.Delete(classObj);
+
+            return NoContent();
+        }
 
 
 
@@ -106,7 +151,7 @@ namespace iread_school_ms.Web.Controller
                 return BadRequest();
             }
 
-            School oldSchool = _schoolService.GetById(id).Result;
+            School oldSchool = _schoolService.GetById(id, false).Result;
             if (oldSchool == null)
             {
                 return NotFound();
@@ -129,7 +174,7 @@ namespace iread_school_ms.Web.Controller
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
-            var school = _schoolService.GetById(id).Result;
+            var school = _schoolService.GetById(id, false).Result;
             if (school == null)
             {
                 return NotFound();

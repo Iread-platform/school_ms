@@ -15,9 +15,10 @@ namespace iread_school_ms.Web.Service
             _publicRepository = publicRepository;
         }
 
-        public async Task<School> GetById(int id)
+        public async Task<School> GetById(int id, bool includeClasses)
         {
-            return await _publicRepository.GetSchoolRepo.GetById(id);
+
+            return await _publicRepository.GetSchoolRepo.GetById(id, includeClasses);
         }
 
         public void Insert(School school)

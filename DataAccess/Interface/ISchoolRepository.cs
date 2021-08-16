@@ -5,7 +5,7 @@ namespace iread_school_ms.DataAccess.Interface
 {
     public interface ISchoolRepository
     {
-        public Task<School> GetById(int id);
+        public Task<School> GetById(int id, bool includeClasses);
 
         public void Insert(School audio);
 
