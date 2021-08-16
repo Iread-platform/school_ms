@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
 
@@ -33,5 +35,9 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetClassRepository.Update(classEntity, oldEntity);
         }
 
+        public async Task<List<Class>> GetBySchool(int schoolId)
+        {
+            return await _publicRepository.GetClassRepository.GetBySchool(schoolId);
+        }
     }
 }

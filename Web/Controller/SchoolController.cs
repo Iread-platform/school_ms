@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.Web.Dto.School;
 using iread_school_ms.Web.Util;
+using System.Collections.Generic;
+using iread_school_ms.Web.Dto.Class;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -17,12 +19,14 @@ namespace iread_school_ms.Web.Controller
     {
         private readonly IMapper _mapper;
         private readonly SchoolService _schoolService;
+        private readonly ClassService _classService;
         private readonly IConsulHttpClientService _consulHttpClient;
 
-        public SchoolController(SchoolService schoolService, IMapper mapper,
+        public SchoolController(SchoolService schoolService, ClassService classService, IMapper mapper,
           IConsulHttpClientService consulHttpClient)
         {
             _schoolService = schoolService;
+            _classService = classService;
             _mapper = mapper;
             _consulHttpClient = consulHttpClient;
         }
@@ -42,6 +46,38 @@ namespace iread_school_ms.Web.Controller
 
             return Ok(_mapper.Map<SchoolDto>(school));
         }
+
+
+        // GET: api/School/1/class/all
+        [HttpGet("{id}/class/all")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetClasses([FromRoute] int id)
+        {
+            var classes = await _classService.GetBySchool(id);
+
+            if (classes == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<InnerClassDto>>(classes));
+        }
+
+        // // POST: api/School/1/class/add
+        // [HttpPost("{id}/class/add")]
+        // [ProducesResponseType(StatusCodes.Status404NotFound)]
+        // [ProducesResponseType(StatusCodes.Status200OK)]
+        // public IActionResult AddClassToSchool([FromBody] ClassCreateDto classObj, [FromQuery] int id)
+        // {
+        //     Class classEntity = _mapper.Map<Class>(classObj);
+        //     classEntity.SchoolId = id;
+        //     _classService.Insert(classEntity);
+
+        //     return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
+        // }
+
+
 
         //POST: api/School/add
         [HttpPost("add")]

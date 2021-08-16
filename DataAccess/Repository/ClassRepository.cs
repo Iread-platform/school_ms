@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
@@ -20,6 +21,7 @@ namespace iread_school_ms.DataAccess.Repository
         {
             return await _context.Classes.Include(c => c.School).SingleOrDefaultAsync(a => a.ClassId == id);
         }
+
 
         public void Insert(Class classObj)
         {
@@ -44,6 +46,11 @@ namespace iread_school_ms.DataAccess.Repository
             _context.Classes.Attach(classObj);
             _context.Entry(classObj).State = EntityState.Modified;
             _context.SaveChanges();
+        }
+
+        public async Task<List<Class>> GetBySchool(int schoolId)
+        {
+            return await _context.Classes.Where(c => c.SchoolId == schoolId).ToListAsync();
         }
 
     }
