@@ -12,7 +12,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.3.1" />
-    <PackageReference Include="EntityFramework.Extended" Version="6.1.0.168" />
   </ItemGroup>
 
 </Project>

@@ -50,5 +50,10 @@ namespace iread_school_ms.Web.Service
         {
             _publicRepository.GetClassMemberRepository.Insert(studentMember);
         }
+
+        public async Task<List<Class>> GetArchived()
+        {
+            return await _publicRepository.GetClassRepository.GetArchived();
+        }
     }
 }

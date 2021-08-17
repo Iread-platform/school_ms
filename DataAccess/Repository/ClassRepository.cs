@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EntityFramework.Extensions;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
@@ -72,10 +71,18 @@ namespace iread_school_ms.DataAccess.Repository
 
         public void ArchiveBySchool(int schoolId)
         {
-            _context.Classes.Where(c => c.SchoolId == schoolId && !c.Archived)
-            .Update(c => new Class { Archived = true });
+            List<Class> notArchivedYet = _context.Classes.Where(c => c.SchoolId == schoolId && !c.Archived).ToList();
+            if (notArchivedYet == null)
+                return;
+
+            notArchivedYet.ForEach(c => c.Archived = true);
             _context.SaveChanges();
+
         }
 
+        public async Task<List<Class>> GetArchived()
+        {
+            return await _context.Classes.Where(c => c.Archived).ToListAsync();
+        }
     }
 }

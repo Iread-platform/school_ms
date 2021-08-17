@@ -47,6 +47,20 @@ namespace iread_school_ms.Web.Controller
             return Ok(_mapper.Map<SchoolDto>(school));
         }
 
+        // GET: api/School/archived
+        [HttpGet("get/archived")]
+        public async Task<IActionResult> GetArchived()
+        {
+            var schools = await _schoolService.GetArchived();
+
+            if (schools == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<SchoolDto>>(schools));
+        }
+
 
         // GET: api/School/1/class/all
         [HttpGet("{id}/class/all")]

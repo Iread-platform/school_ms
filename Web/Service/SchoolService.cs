@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
@@ -36,6 +37,11 @@ namespace iread_school_ms.Web.Service
         internal void Update(School schoolEntity, School oldSchool)
         {
             _publicRepository.GetSchoolRepo.Update(schoolEntity, oldSchool);
+        }
+
+        public async Task<List<School>> GetArchived()
+        {
+            return await _publicRepository.GetSchoolRepo.GetArchived();
         }
 
     }

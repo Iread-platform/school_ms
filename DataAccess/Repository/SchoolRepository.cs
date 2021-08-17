@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
@@ -55,6 +56,14 @@ namespace iread_school_ms.DataAccess.Repository
         {
             school.Archived = true;
             _context.SaveChanges();
+        }
+
+        public async Task<List<School>> GetArchived()
+        {
+            return await _context.Schools
+            .Where(s => s.Archived)
+            .Include(s => s.Classes)
+            .ToListAsync();
         }
     }
 }

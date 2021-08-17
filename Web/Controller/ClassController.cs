@@ -13,6 +13,7 @@ using System;
 using iread_school_ms.Web.Dto.UserDto;
 using iread_identity_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Data.Type;
+using System.Collections.Generic;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -47,6 +48,21 @@ namespace iread_school_ms.Web.Controller
             }
 
             return Ok(_mapper.Map<ClassDto>(classObj));
+        }
+
+
+        // GET: api/School/Class/archived
+        [HttpGet("get/archived")]
+        public async Task<IActionResult> GetArchived()
+        {
+            var classes = await _classService.GetArchived();
+
+            if (classes == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<InnerClassDto>>(classes));
         }
 
 
