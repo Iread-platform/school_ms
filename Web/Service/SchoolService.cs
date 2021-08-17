@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
@@ -26,14 +27,21 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetSchoolRepo.Insert(school);
         }
 
-        public void Delete(School school)
+        public void Archive(School school)
         {
-            _publicRepository.GetSchoolRepo.Delete(school);
+            // archive the school and it's classes
+            _publicRepository.GetClassRepository.ArchiveBySchool(school.SchoolId);
+            _publicRepository.GetSchoolRepo.Archive(school);
         }
 
         internal void Update(School schoolEntity, School oldSchool)
         {
             _publicRepository.GetSchoolRepo.Update(schoolEntity, oldSchool);
+        }
+
+        public async Task<List<School>> GetArchived()
+        {
+            return await _publicRepository.GetSchoolRepo.GetArchived();
         }
 
     }
