@@ -19,9 +19,11 @@ namespace iread_school_ms.DataAccess.Repository
         public async Task<School> GetById(int id, bool includeClasses)
         {
             if (includeClasses)
-                return await _context.Schools.Include(s => s.Classes).FirstOrDefaultAsync(a => a.SchoolId == id);
+                return await _context.Schools.Include(s => s.Classes)
+                .FirstOrDefaultAsync(s => s.SchoolId == id && !s.Archived);
 
-            return await _context.Schools.FirstOrDefaultAsync(a => a.SchoolId == id);
+            return await _context.Schools
+            .FirstOrDefaultAsync(s => s.SchoolId == id && !s.Archived);
         }
 
         public void Insert(School audio)
@@ -38,7 +40,7 @@ namespace iread_school_ms.DataAccess.Repository
 
         public bool Exists(int id)
         {
-            return _context.Schools.Any(a => a.SchoolId == id);
+            return _context.Schools.Any(s => s.SchoolId == id && !s.Archived);
         }
 
         public void Update(School school, School oldSchool)
