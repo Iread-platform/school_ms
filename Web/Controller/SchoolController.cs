@@ -9,6 +9,10 @@ using iread_school_ms.Web.Dto.School;
 using iread_school_ms.Web.Util;
 using System.Collections.Generic;
 using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.User;
+using iread_school_ms.DataAccess.Data.Type;
+using System;
+using iread_school_ms.Web.Dto.UserDto;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -84,6 +88,75 @@ namespace iread_school_ms.Web.Controller
             _classService.Insert(classEntity);
 
             return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
+        }
+
+
+        // POST: api/School/1/manager/add
+        [HttpPost("{id}/manager/add")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AddManagerToSchool([FromBody] ManagerDto manager, [FromRoute] int id)
+        {
+
+            if (manager == null)
+            {
+                return BadRequest();
+            }
+
+            SchoolMember managerMember = _mapper.Map<SchoolMember>(manager);
+            managerMember.SchoolId = id;
+            managerMember.SchoolMembershipType = SchoolMembershipType.SchoolManager.ToString();
+            ValidationLogicForAddMember(managerMember);
+
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _schoolService.AddMember(managerMember);
+
+            return NoContent();
+        }
+
+        private void ValidationLogicForAddMember(SchoolMember managerMember)
+        {
+
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{managerMember.MemberId}/get").Result;
+            if (user == null)
+            {
+                ModelState.AddModelError("User", "User not found");
+            }
+            else
+            {
+                if (user.Role != managerMember.SchoolMembershipType)
+                {
+                    ModelState.AddModelError("User", $"User not {managerMember.SchoolMembershipType}");
+                }
+                else
+                {
+                    managerMember.FirstName = user.FirstName;
+                    managerMember.LastName = user.LastName;
+                }
+
+            }
+
+            School school = _schoolService.GetById((int)managerMember.SchoolId, true).Result;
+            if (school == null)
+            {
+                ModelState.AddModelError("School", "School not found");
+            }
+            else
+            {
+                if (school.Members.Find(m => m.MemberId == managerMember.MemberId) != null)
+                {
+                    ModelState.AddModelError("Member", "User already exists in this school");
+                }
+                else
+                {
+                    managerMember.School = school;
+                }
+
+            }
         }
 
 
