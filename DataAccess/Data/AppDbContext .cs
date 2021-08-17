@@ -24,13 +24,18 @@ namespace iread_school_ms.DataAccess.Data
                 .HasMany(c => c.Members)
                 .WithOne(m => m.Class)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<School>()
+                .HasMany(c => c.Members)
+                .WithOne(m => m.School)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         //entities
         public DbSet<School> Schools { get; set; }
-        public DbSet<SchoolManager> SchoolManagers { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<ClassMember> ClassMembers { get; set; }
+        public DbSet<SchoolMember> SchoolMembers { get; set; }
 
     }
 }

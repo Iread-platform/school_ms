@@ -36,5 +36,10 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetSchoolRepo.Update(schoolEntity, oldSchool);
         }
 
+        public void AddMember(SchoolMember schoolMember)
+        {
+            _publicRepository.GetSchoolMemberRepository.Insert(schoolMember);
+        }
+
     }
 }
