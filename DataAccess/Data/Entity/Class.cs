@@ -18,6 +18,8 @@ namespace iread_school_ms.DataAccess.Data.Entity
         public int SchoolId { get; set; }
         public School School { get; set; }
         public List<ClassMember> Members { get; set; }
+        public bool Archived { get; set; }
+
 
     }
 }

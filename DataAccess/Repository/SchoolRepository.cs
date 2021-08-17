@@ -49,5 +49,10 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChanges();
         }
 
+        public void Archive(School school)
+        {
+            school.Archived = true;
+            _context.SaveChanges();
+        }
     }
 }
