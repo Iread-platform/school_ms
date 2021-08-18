@@ -5,13 +5,11 @@ using iread_interaction_ms.Web.Service;
 using iread_school_ms.Web.Service;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
-using iread_school_ms.Web.Dto.School;
 using iread_school_ms.Web.Util;
 using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.User;
 using System;
 using iread_school_ms.Web.Dto.UserDto;
-using iread_identity_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Data.Type;
 using System.Collections.Generic;
 
@@ -24,13 +22,16 @@ namespace iread_school_ms.Web.Controller
     {
         private readonly IMapper _mapper;
         private readonly ClassService _classService;
+        private readonly SchoolService _schoolService;
         private readonly IConsulHttpClientService _consulHttpClient;
 
         public ClassController(ClassService classService, IMapper mapper,
+        SchoolService schoolService,
           IConsulHttpClientService consulHttpClient)
         {
             _classService = classService;
             _mapper = mapper;
+            _schoolService = schoolService;
             _consulHttpClient = consulHttpClient;
         }
 
@@ -86,6 +87,13 @@ namespace iread_school_ms.Web.Controller
 
             _classService.AddMember(studentMember);
 
+            // register as school member
+            SchoolMember schoolMember = _mapper.Map<SchoolMember>(studentMember);
+            schoolMember.SchoolId = studentMember.Class.SchoolId;
+            schoolMember.SchoolMembershipType = SchoolMembershipType.Student.ToString();
+            _schoolService.AddMember(schoolMember);
+
+
             return NoContent();
         }
 
@@ -111,10 +119,14 @@ namespace iread_school_ms.Web.Controller
 
             _classService.AddMember(teacherMember);
 
+            // register as school member
+            SchoolMember schoolMember = _mapper.Map<SchoolMember>(teacherMember);
+            schoolMember.SchoolId = teacherMember.Class.SchoolId;
+            schoolMember.SchoolMembershipType = SchoolMembershipType.Teacher.ToString();
+            _schoolService.AddMember(schoolMember);
+
             return NoContent();
         }
-
-
 
         //DELETE: api/class/5/archive
         [HttpDelete("{id}/archive")]
@@ -141,38 +153,43 @@ namespace iread_school_ms.Web.Controller
 
 
 
-        private void ValidationLogicForAddMember(ClassMember student)
+        private void ValidationLogicForAddMember(ClassMember member)
+
         {
 
-            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{student.MemberId}/get").Result;
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").Result;
             if (user == null)
             {
                 ModelState.AddModelError("User", "User not found");
             }
             else
             {
-                if (user.Role != student.ClassMembershipType)
+                if (user.Role != member.ClassMembershipType)
                 {
-                    ModelState.AddModelError("User", $"User not {student.ClassMembershipType}");
+                    ModelState.AddModelError("User", $"User not {member.ClassMembershipType}");
                 }
                 else
                 {
-                    student.FirstName = user.FirstName;
-                    student.LastName = user.LastName;
+                    member.FirstName = user.FirstName;
+                    member.LastName = user.LastName;
                 }
 
             }
 
-            Class classObj = _classService.GetById((int)student.ClassId, true).Result;
+            Class classObj = _classService.GetById((int)member.ClassId, true).Result;
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
             }
             else
             {
-                if (classObj.Members.Find(m => m.MemberId == student.MemberId) != null)
+                if (classObj.Members.Find(m => m.MemberId == member.MemberId) != null)
                 {
                     ModelState.AddModelError("Member", "User already exists in this class");
+                }
+                else
+                {
+                    member.Class = classObj;
                 }
 
             }

@@ -8,9 +8,9 @@ namespace iread_school_ms.DataAccess.Interface
     {
         public Task<ClassMember> GetById(int id);
 
-        public void Insert(ClassMember classObj);
+        public void Insert(ClassMember classMember);
 
-        public void Delete(ClassMember classObj);
+        public void Delete(ClassMember classMember);
 
     }
 }

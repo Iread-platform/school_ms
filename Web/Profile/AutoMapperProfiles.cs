@@ -20,10 +20,14 @@ namespace iread_school_ms.Web.Profile
             CreateMap<Class, InnerClassDto>().ReverseMap();
             CreateMap<Class, ClassCreateDto>().ReverseMap();
 
-            //ClassMember Mapper
+            //Class Member Mapper
             CreateMap<ClassMember, StudentDto>().ReverseMap();
             CreateMap<ClassMember, TeacherDto>().ReverseMap();
             CreateMap<ClassMember, InnerClassMemberDto>().ReverseMap();
+            CreateMap<ClassMember, SchoolMember>().ReverseMap();
+
+            //School Member Mapper
+            CreateMap<SchoolMember, ManagerDto>().ReverseMap();
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
-using Microsoft.EntityFrameworkCore;
 
 namespace iread_school_ms.Web.Service
 {
@@ -39,6 +38,12 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetSchoolRepo.Update(schoolEntity, oldSchool);
         }
 
+
+        public void AddMember(SchoolMember schoolMember)
+        {
+            _publicRepository.GetSchoolMemberRepository.Insert(schoolMember);
+        }
+
         public async Task<List<School>> GetArchived()
         {
             return await _publicRepository.GetSchoolRepo.GetArchived();
@@ -48,5 +53,6 @@ namespace iread_school_ms.Web.Service
         {
             return await _publicRepository.GetSchoolRepo.GetAll();
         }
+
     }
 }

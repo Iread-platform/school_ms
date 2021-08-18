@@ -46,9 +46,9 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetClassRepository.GetBySchool(schoolId);
         }
 
-        public void AddMember(ClassMember studentMember)
+        public void AddMember(ClassMember classMember)
         {
-            _publicRepository.GetClassMemberRepository.Insert(studentMember);
+            _publicRepository.GetClassMemberRepository.Insert(classMember);
         }
 
         public async Task<List<Class>> GetArchived()
