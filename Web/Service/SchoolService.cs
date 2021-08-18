@@ -44,5 +44,9 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetSchoolRepo.GetArchived();
         }
 
+        public async Task<List<School>> GetAll()
+        {
+            return await _publicRepository.GetSchoolRepo.GetAll();
+        }
     }
 }

@@ -45,6 +45,17 @@ namespace iread_school_ms
         public void ConfigureServices(IServiceCollection services)
         {
 
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "_myAllowSpecificOrigins", builder =>
+                     builder
+                         .AllowAnyOrigin()
+                         .AllowAnyMethod()
+                         .AllowAnyHeader());
+            });
+
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -113,7 +124,7 @@ namespace iread_school_ms
             //app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors("_myAllowSpecificOrigins");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

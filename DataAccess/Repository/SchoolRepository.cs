@@ -65,5 +65,12 @@ namespace iread_school_ms.DataAccess.Repository
             .Include(s => s.Classes)
             .ToListAsync();
         }
+
+        public async Task<List<School>> GetAll()
+        {
+            return await _context.Schools
+            .Where(s => !s.Archived)
+            .ToListAsync();
+        }
     }
 }

@@ -31,6 +31,22 @@ namespace iread_school_ms.Web.Controller
             _consulHttpClient = consulHttpClient;
         }
 
+
+        // GET: api/School/all
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var schools = await _schoolService.GetAll();
+
+            if (schools == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<SchoolDto>>(schools));
+        }
+
+
         // GET: api/School/get/1
         [HttpGet("get/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
