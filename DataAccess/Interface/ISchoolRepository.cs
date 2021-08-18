@@ -18,5 +18,6 @@ namespace iread_school_ms.DataAccess.Interface
 
         public void Update(School schoolEntity, School oldSchool);
         public Task<List<School>> GetArchived();
+        public Task<List<School>> GetAll();
     }
 }
