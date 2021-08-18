@@ -35,6 +35,22 @@ namespace iread_school_ms.Web.Controller
             _consulHttpClient = consulHttpClient;
         }
 
+
+        // GET: api/School/all
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var schools = await _schoolService.GetAll();
+
+            if (schools == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<SchoolDto>>(schools));
+        }
+
+
         // GET: api/School/get/1
         [HttpGet("get/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +65,20 @@ namespace iread_school_ms.Web.Controller
             }
 
             return Ok(_mapper.Map<SchoolDto>(school));
+        }
+
+        // GET: api/School/archived
+        [HttpGet("get/archived")]
+        public async Task<IActionResult> GetArchived()
+        {
+            var schools = await _schoolService.GetArchived();
+
+            if (schools == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<SchoolDto>>(schools));
         }
 
 
@@ -89,6 +119,7 @@ namespace iread_school_ms.Web.Controller
 
             return CreatedAtAction(nameof(ClassController.GetById), new { id = classEntity.ClassId }, _mapper.Map<ClassDto>(classEntity));
         }
+
 
 
         // POST: api/School/1/manager/add
@@ -160,7 +191,6 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-
         // DELETE: api/School/1/class/delete/1
         [HttpDelete("{id}/class/delete/{classId}")]
         public IActionResult Delete([FromRoute] int id, [FromRoute] int classId)
@@ -190,11 +220,10 @@ namespace iread_school_ms.Web.Controller
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
 
-            _classService.Delete(classObj);
+            _classService.Archive(classObj);
 
             return NoContent();
         }
-
 
 
         //POST: api/School/add
@@ -239,41 +268,23 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-        //DELETE: api/School/5/delete
-        [HttpDelete("{id}/delete")]
-        public IActionResult Delete([FromRoute] int id)
+        //DELETE: api/School/5/archive
+        [HttpDelete("{id}/archive")]
+        public IActionResult Archive([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
-            var school = _schoolService.GetById(id, false).Result;
+            var school = _schoolService.GetById(id, true).Result;
             if (school == null)
             {
                 return NotFound();
             }
 
-            _schoolService.Delete(school);
+            _schoolService.Archive(school);
             return NoContent();
         }
 
-
-
-        // private void ValidationLogicForUpdating(Audio audio)
-        // {
-        //     AttachmentDTO attachmentDto = _consulHttpClient.GetAsync<AttachmentDTO>("attachment_ms", $"/api/Attachment/get/{audio.AttachmentId}").Result;
-
-        //     if (attachmentDto == null || attachmentDto.Id < 1)
-        //     {
-        //         ModelState.AddModelError("AudioId", "Attachment not found");
-        //     }
-        //     else
-        //     {
-        //         if (!AudioExtensions.All.Contains(attachmentDto.Extension.ToLower()))
-        //         {
-        //             ModelState.AddModelError("Audio", "Audio not have valid extension, should be one of [" + string.Join(",", AudioExtensions.All) + "]");
-        //         }
-        //     }
-        // }
     }
 }

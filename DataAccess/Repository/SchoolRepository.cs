@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
@@ -24,7 +25,8 @@ namespace iread_school_ms.DataAccess.Repository
                 .Include(s => s.Members)
                 .FirstOrDefaultAsync(a => a.SchoolId == id);
 
-            return await _context.Schools.FirstOrDefaultAsync(a => a.SchoolId == id);
+            return await _context.Schools
+            .FirstOrDefaultAsync(s => s.SchoolId == id && !s.Archived);
         }
 
         public void Insert(School audio)
@@ -41,7 +43,7 @@ namespace iread_school_ms.DataAccess.Repository
 
         public bool Exists(int id)
         {
-            return _context.Schools.Any(a => a.SchoolId == id);
+            return _context.Schools.Any(s => s.SchoolId == id && !s.Archived);
         }
 
         public void Update(School school, School oldSchool)
@@ -52,5 +54,25 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChanges();
         }
 
+        public void Archive(School school)
+        {
+            school.Archived = true;
+            _context.SaveChanges();
+        }
+
+        public async Task<List<School>> GetArchived()
+        {
+            return await _context.Schools
+            .Where(s => s.Archived)
+            .Include(s => s.Classes)
+            .ToListAsync();
+        }
+
+        public async Task<List<School>> GetAll()
+        {
+            return await _context.Schools
+            .Where(s => !s.Archived)
+            .ToListAsync();
+        }
     }
 }

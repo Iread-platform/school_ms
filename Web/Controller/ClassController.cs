@@ -11,6 +11,7 @@ using iread_school_ms.Web.Dto.User;
 using System;
 using iread_school_ms.Web.Dto.UserDto;
 using iread_school_ms.DataAccess.Data.Type;
+using System.Collections.Generic;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -48,6 +49,21 @@ namespace iread_school_ms.Web.Controller
             }
 
             return Ok(_mapper.Map<ClassDto>(classObj));
+        }
+
+
+        // GET: api/School/Class/archived
+        [HttpGet("get/archived")]
+        public async Task<IActionResult> GetArchived()
+        {
+            var classes = await _classService.GetArchived();
+
+            if (classes == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<InnerClassDto>>(classes));
         }
 
 
@@ -112,7 +128,33 @@ namespace iread_school_ms.Web.Controller
             return NoContent();
         }
 
+        //DELETE: api/class/5/archive
+        [HttpDelete("{id}/archive")]
+        public IActionResult Archive([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            var classObj = _classService.GetById(id, false).Result;
+            if (classObj == null)
+            {
+                return NotFound();
+            }
+            if (classObj.Archived)
+            {
+                ModelState.AddModelError("Archive", "class is archived");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _classService.Archive(classObj);
+            return NoContent();
+        }
+
+
+
         private void ValidationLogicForAddMember(ClassMember member)
+
         {
 
             UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").Result;
@@ -156,41 +198,4 @@ namespace iread_school_ms.Web.Controller
 
     }
 
-
-    // //DELETE: api/School/5/delete
-    // [HttpDelete("{id}/delete")]
-    // public IActionResult Delete([FromRoute] int id)
-    // {
-    //     if (!ModelState.IsValid)
-    //     {
-    //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-    //     }
-    //     var school = _schoolService.GetById(id).Result;
-    //     if (school == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     _schoolService.Delete(school);
-    //     return NoContent();
-    // }
-
-
-
-    // private void ValidationLogicForUpdating(Audio audio)
-    // {
-    //     AttachmentDTO attachmentDto = _consulHttpClient.GetAsync<AttachmentDTO>("attachment_ms", $"/api/Attachment/get/{audio.AttachmentId}").Result;
-
-    //     if (attachmentDto == null || attachmentDto.Id < 1)
-    //     {
-    //         ModelState.AddModelError("AudioId", "Attachment not found");
-    //     }
-    //     else
-    //     {
-    //         if (!AudioExtensions.All.Contains(attachmentDto.Extension.ToLower()))
-    //         {
-    //             ModelState.AddModelError("Audio", "Audio not have valid extension, should be one of [" + string.Join(",", AudioExtensions.All) + "]");
-    //         }
-    //     }
-    // }
 }
