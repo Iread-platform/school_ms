@@ -192,38 +192,38 @@ namespace iread_school_ms.Web.Controller
 
 
         // DELETE: api/School/1/class/delete/1
-        [HttpDelete("{id}/class/delete/{classId}")]
-        public IActionResult Delete([FromRoute] int id, [FromRoute] int classId)
-        {
+        // [HttpDelete("{id}/class/delete/{classId}")]
+        // public IActionResult Delete([FromRoute] int id, [FromRoute] int classId)
+        // {
 
-            School school = _schoolService.GetById(id, true).Result;
-            Class classObj = _classService.GetById(classId, false).Result;
+        //     School school = _schoolService.GetById(id, true).Result;
+        //     Class classObj = _classService.GetById(classId, false).Result;
 
 
-            if (school == null)
-            {
-                ModelState.AddModelError("School", "School not found");
-            }
+        //     if (school == null)
+        //     {
+        //         ModelState.AddModelError("School", "School not found");
+        //     }
 
-            if (classObj == null)
-            {
-                ModelState.AddModelError("Class", "Class not found");
-            }
+        //     if (classObj == null)
+        //     {
+        //         ModelState.AddModelError("Class", "Class not found");
+        //     }
 
-            if (ModelState.ErrorCount != 0)
-            {
-                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-            }
-            if (school.Classes.Find(c => c.ClassId == classObj.ClassId) == null)
-            {
-                ModelState.AddModelError("Class", "Class not related to this school");
-                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
-            }
+        //     if (ModelState.ErrorCount != 0)
+        //     {
+        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+        //     }
+        //     if (school.Classes.Find(c => c.ClassId == classObj.ClassId) == null)
+        //     {
+        //         ModelState.AddModelError("Class", "Class not related to this school");
+        //         return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+        //     }
 
-            _classService.Archive(classObj);
+        //     _classService.Archive(classObj);
 
-            return NoContent();
-        }
+        //     return NoContent();
+        // }
 
 
         //POST: api/School/add
@@ -268,8 +268,8 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-        //DELETE: api/School/5/archive
-        [HttpDelete("{id}/archive")]
+        //Put: api/School/5/archive
+        [HttpPut("{id}/archive")]
         public IActionResult Archive([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -282,9 +282,41 @@ namespace iread_school_ms.Web.Controller
                 return NotFound();
             }
 
-            _schoolService.Archive(school);
+            if (school.Archived)
+            {
+                ModelState.AddModelError("Archive", "school already archive");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _schoolService.Archive(school, true);
             return NoContent();
         }
+
+
+        //Put: api/School/5/unarchive
+        [HttpPut("{id}/unarchive")]
+        public IActionResult Unarchive([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            var school = _schoolService.GetById(id, true).Result;
+            if (school == null)
+            {
+                return NotFound();
+            }
+
+            if (!school.Archived)
+            {
+                ModelState.AddModelError("Archive", "school already unarchive");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _schoolService.Archive(school, false);
+            return NoContent();
+        }
+
 
     }
 }

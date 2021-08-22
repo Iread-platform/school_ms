@@ -10,17 +10,18 @@ namespace iread_school_ms.DataAccess.Interface
 
         public Task<List<Class>> GetBySchool(int schoolId);
 
-        public Task<List<Class>> GetArchived();
+        public Task<List<Class>> GetArchived(bool archived);
 
         public void Insert(Class classObj);
 
         public void Delete(Class classObj);
 
-        public void Archive(Class classObj);
+        public void Archive(Class classObj, bool archived);
 
         public bool Exists(int id);
 
         public void Update(Class classEntity, Class oldClass);
         public void ArchiveBySchool(int schoolId);
+        public Task<List<Class>> GetAll();
     }
 }

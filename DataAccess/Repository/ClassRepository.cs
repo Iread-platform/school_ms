@@ -17,6 +17,11 @@ namespace iread_school_ms.DataAccess.Repository
             _context = context;
         }
 
+        public async Task<List<Class>> GetAll()
+        {
+            return await _context.Classes.ToListAsync();
+        }
+
         public async Task<Class> GetById(int id, bool includeMambers)
         {
             if (includeMambers)
@@ -27,7 +32,7 @@ namespace iread_school_ms.DataAccess.Repository
 
             return await _context.Classes
                 .Include(c => c.School)
-                .SingleOrDefaultAsync(c => c.ClassId == id && !c.Archived);
+                .SingleOrDefaultAsync(c => c.ClassId == id);
 
 
         }
@@ -47,7 +52,7 @@ namespace iread_school_ms.DataAccess.Repository
 
         public bool Exists(int id)
         {
-            return _context.Classes.Any(c => c.ClassId == id && !c.Archived);
+            return _context.Classes.Any(c => c.ClassId == id);
         }
 
         public void Update(Class classObj, Class oldClass)
@@ -60,12 +65,12 @@ namespace iread_school_ms.DataAccess.Repository
 
         public async Task<List<Class>> GetBySchool(int schoolId)
         {
-            return await _context.Classes.Where(c => c.SchoolId == schoolId && !c.Archived).ToListAsync();
+            return await _context.Classes.Where(c => c.SchoolId == schoolId).ToListAsync();
         }
 
-        public void Archive(Class classObj)
+        public void Archive(Class classObj, bool archived)
         {
-            classObj.Archived = true;
+            classObj.Archived = archived;
             _context.SaveChanges();
         }
 
@@ -80,9 +85,9 @@ namespace iread_school_ms.DataAccess.Repository
 
         }
 
-        public async Task<List<Class>> GetArchived()
+        public async Task<List<Class>> GetArchived(bool archived)
         {
-            return await _context.Classes.Where(c => c.Archived).ToListAsync();
+            return await _context.Classes.Where(c => c.Archived == archived).ToListAsync();
         }
     }
 }

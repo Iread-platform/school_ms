@@ -52,11 +52,11 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-        // GET: api/School/Class/archived
-        [HttpGet("get/archived")]
+        // GET: api/School/Class/all
+        [HttpGet("all")]
         public async Task<IActionResult> GetArchived()
         {
-            var classes = await _classService.GetArchived();
+            var classes = await _classService.GetAll();
 
             if (classes == null)
             {
@@ -128,8 +128,8 @@ namespace iread_school_ms.Web.Controller
             return NoContent();
         }
 
-        //DELETE: api/class/5/archive
-        [HttpDelete("{id}/archive")]
+        //Put: api/class/5/archive
+        [HttpPut("{id}/archive")]
         public IActionResult Archive([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -143,11 +143,34 @@ namespace iread_school_ms.Web.Controller
             }
             if (classObj.Archived)
             {
-                ModelState.AddModelError("Archive", "class is archived");
+                ModelState.AddModelError("Archive", "class already archived");
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
 
-            _classService.Archive(classObj);
+            _classService.Archive(classObj, true);
+            return NoContent();
+        }
+
+        //Put: api/class/5/unarchive
+        [HttpPut("{id}/unarchive")]
+        public IActionResult Unarchive([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+            var classObj = _classService.GetById(id, false).Result;
+            if (classObj == null)
+            {
+                return NotFound();
+            }
+            if (!classObj.Archived)
+            {
+                ModelState.AddModelError("Archive", "class already unarchived");
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _classService.Archive(classObj, false);
             return NoContent();
         }
 

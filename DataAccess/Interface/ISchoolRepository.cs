@@ -12,7 +12,7 @@ namespace iread_school_ms.DataAccess.Interface
 
         public void Delete(School school);
 
-        public void Archive(School school);
+        public void Archive(School school, bool archive);
 
         public bool Exists(int id);
 

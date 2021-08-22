@@ -6,6 +6,7 @@ namespace iread_school_ms.Web.Dto.Class
     {
         public int ClassId { get; set; }
         public string Title { get; set; }
+        public bool Archived { get; set; }
 
     }
 }

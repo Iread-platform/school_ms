@@ -54,9 +54,9 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChanges();
         }
 
-        public void Archive(School school)
+        public void Archive(School school, bool archive)
         {
-            school.Archived = true;
+            school.Archived = archive;
             _context.SaveChanges();
         }
 
@@ -71,7 +71,6 @@ namespace iread_school_ms.DataAccess.Repository
         public async Task<List<School>> GetAll()
         {
             return await _context.Schools
-            .Where(s => !s.Archived)
             .ToListAsync();
         }
     }

@@ -9,6 +9,8 @@ namespace iread_school_ms.Web.Dto.Class
         public string Title { get; set; }
         public InnerSchoolDto School { get; set; }
         public List<InnerClassMemberDto> Members { get; set; }
+        public bool Archived { get; set; }
+
 
     }
 }

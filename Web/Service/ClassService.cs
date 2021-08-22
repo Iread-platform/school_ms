@@ -26,9 +26,9 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetClassRepository.Insert(classObj);
         }
 
-        public void Archive(Class classObj)
+        public void Archive(Class classObj, bool archived)
         {
-            _publicRepository.GetClassRepository.Archive(classObj);
+            _publicRepository.GetClassRepository.Archive(classObj, archived);
         }
 
         public void ArchiveBySchool(int schoolId)
@@ -51,9 +51,14 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetClassMemberRepository.Insert(classMember);
         }
 
-        public async Task<List<Class>> GetArchived()
+        public async Task<List<Class>> GetArchived(bool archived)
         {
-            return await _publicRepository.GetClassRepository.GetArchived();
+            return await _publicRepository.GetClassRepository.GetArchived(archived);
+        }
+
+        public async Task<List<Class>> GetAll()
+        {
+            return await _publicRepository.GetClassRepository.GetAll();
         }
     }
 }
