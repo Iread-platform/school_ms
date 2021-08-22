@@ -12,5 +12,6 @@ namespace iread_school_ms.DataAccess.Interface
 
         public void Delete(SchoolMember schoolMember);
 
+        public Task<List<SchoolMember>> GetManagers(int schoolId);
     }
 }

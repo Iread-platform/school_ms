@@ -37,5 +37,12 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChanges();
         }
 
+
+        public async Task<List<SchoolMember>> GetManagers(int schoolId)
+        {
+            return await _context.SchoolMembers
+            .Where(s => s.SchoolId == schoolId)
+            .ToListAsync();
+        }
     }
 }

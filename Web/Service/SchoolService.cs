@@ -54,5 +54,9 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetSchoolRepo.GetAll();
         }
 
+        internal async Task<List<SchoolMember>> GetManagers(int schoolId)
+        {
+            return await _publicRepository.GetSchoolMemberRepository.GetManagers(schoolId);
+        }
     }
 }

@@ -81,6 +81,20 @@ namespace iread_school_ms.Web.Controller
             return Ok(_mapper.Map<List<SchoolDto>>(schools));
         }
 
+        // GET: api/School/1/manager/get
+        [HttpGet("{id}/manager/get")]
+        public async Task<IActionResult> GetManager([FromRoute] int id)
+        {
+            var managers = await _schoolService.GetManagers(id);
+
+            if (managers == null || managers.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<SchoolManagerDto>>(managers));
+        }
+
 
         // GET: api/School/1/class/all
         [HttpGet("{id}/class/all")]
