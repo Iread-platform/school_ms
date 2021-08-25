@@ -13,5 +13,7 @@ namespace iread_school_ms.DataAccess.Interface
         public void Delete(SchoolMember schoolMember);
 
         public Task<List<SchoolMember>> GetManagers(int schoolId);
+        public Task<List<SchoolMember>> GetStudents(int schoolId);
+        public Task<List<SchoolMember>> GetTeachers(int schoolId);
     }
 }

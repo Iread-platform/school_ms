@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
+using iread_school_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,8 +42,27 @@ namespace iread_school_ms.DataAccess.Repository
         public async Task<List<SchoolMember>> GetManagers(int schoolId)
         {
             return await _context.SchoolMembers
-            .Where(s => s.SchoolId == schoolId)
+            .Where(s => s.SchoolId == schoolId
+            && s.SchoolMembershipType == SchoolMembershipType.SchoolManager.ToString())
             .ToListAsync();
         }
+
+        public async Task<List<SchoolMember>> GetStudents(int schoolId)
+        {
+            return await _context.SchoolMembers
+            .Where(s => s.SchoolId == schoolId
+            && s.SchoolMembershipType == SchoolMembershipType.Student.ToString())
+            .ToListAsync();
+        }
+
+        public async Task<List<SchoolMember>> GetTeachers(int schoolId)
+        {
+            return await _context.SchoolMembers
+            .Where(s => s.SchoolId == schoolId
+            && s.SchoolMembershipType == SchoolMembershipType.Teacher.ToString())
+            .ToListAsync();
+        }
+
+
     }
 }

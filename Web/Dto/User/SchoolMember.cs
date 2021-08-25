@@ -1,6 +1,6 @@
 namespace iread_school_ms.Web.Dto.User
 {
-    public class SchoolManagerDto
+    public class SchoolMemberDto
     {
         public string Id { get; set; }
         public string FirstName { get; set; }
