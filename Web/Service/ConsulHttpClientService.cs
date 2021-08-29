@@ -10,23 +10,23 @@ using Consul;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace iread_interaction_ms.Web.Service
+namespace iread_school_ms.Web.Service
 {
-    public class ConsulHttpClientService:IConsulHttpClientService
+    public class ConsulHttpClientService : IConsulHttpClientService
     {
-          private readonly HttpClient _client;
+        private readonly HttpClient _client;
         private IConsulClient _consulClient;
-        
+
         public ConsulHttpClientService(HttpClient client, IConsulClient consulclient)
         {
             _client = client;
             _consulClient = consulclient;
         }
-        
+
         public async Task<T> GetAsync<T>(string serviceName, string requestUri)
         {
             var uri = await GetRequestUriAsync(serviceName, requestUri);
-            
+
             var response = await _client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
@@ -38,13 +38,13 @@ namespace iread_interaction_ms.Web.Service
 
             return JsonConvert.DeserializeObject<T>(content);
         }
-        
+
         public async Task<T> PostBodyAsync<T>(string serviceName, string requestUri, Object obj)
         {
             var uri = await GetRequestUriAsync(serviceName, requestUri);
-            
+
             var stringContent = new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync(uri,stringContent);
+            var response = await _client.PostAsync(uri, stringContent);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -76,18 +76,18 @@ namespace iread_interaction_ms.Web.Service
                                 ContentLength = attachment.Length,
                                 ContentType = new MediaTypeHeaderValue(attachment.ContentType)
                             }
-                        },"File",attachment.FileName);
+                        }, "File", attachment.FileName);
                 }
             }
-            
+
             if (parameters != null)
             {
                 foreach (var parameter in parameters)
                 {
-                    formDataContent.Add(new StringContent(parameter.Value, Encoding.UTF8, "application/json"),parameter.Key);
+                    formDataContent.Add(new StringContent(parameter.Value, Encoding.UTF8, "application/json"), parameter.Key);
                 }
             }
-            var response = await _client.PostAsync(uri,formDataContent);
+            var response = await _client.PostAsync(uri, formDataContent);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -102,9 +102,9 @@ namespace iread_interaction_ms.Web.Service
         public async Task<T> PutBodyAsync<T>(string serviceName, string requestUri, object obj)
         {
             var uri = await GetRequestUriAsync(serviceName, requestUri);
-            
+
             var stringContent = new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
-            var response = await _client.PutAsync(uri,stringContent);
+            var response = await _client.PutAsync(uri, stringContent);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -115,7 +115,7 @@ namespace iread_interaction_ms.Web.Service
 
             return JsonConvert.DeserializeObject<T>(content);
         }
-        
+
         public async Task<T> PutFormAsync<T>(string serviceName, string requestUri, Dictionary<string, string> parameters, List<IFormFile>? attachments)
         {
             var uri = await GetRequestUriAsync(serviceName, requestUri);
@@ -134,18 +134,18 @@ namespace iread_interaction_ms.Web.Service
                                 ContentLength = attachment.Length,
                                 ContentType = new MediaTypeHeaderValue(attachment.ContentType)
                             }
-                        },"File",attachment.FileName);
+                        }, "File", attachment.FileName);
                 }
             }
-            
+
             if (parameters != null)
             {
                 foreach (var ob in parameters)
                 {
-                    formDataContent.Add(new StringContent(ob.Value, Encoding.UTF8, "application/json"),ob.Key);
+                    formDataContent.Add(new StringContent(ob.Value, Encoding.UTF8, "application/json"), ob.Key);
                 }
             }
-            var response = await _client.PutAsync(uri,formDataContent);
+            var response = await _client.PutAsync(uri, formDataContent);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -156,6 +156,9 @@ namespace iread_interaction_ms.Web.Service
 
             return JsonConvert.DeserializeObject<T>(content);
         }
+
+
+
 
 
         private async Task<Uri> GetRequestUriAsync(string serviceName, string uri)
@@ -177,7 +180,7 @@ namespace iread_interaction_ms.Web.Service
             {
                 throw new Exception($"Consul service: '{serviceName}' was not found.");
             }
-            
+
             var uriBuilder = new UriBuilder
             {
                 Host = service.Address,
@@ -199,5 +202,55 @@ namespace iread_interaction_ms.Web.Service
             return servToUse;
         }
 
+        public async Task<T> PostFormAsync<T>(string serviceName, string requestUri, Dictionary<string, string> parameters, Object obj)
+        {
+            var uri = await GetRequestUriAsync(serviceName, requestUri);
+
+            var formDataContent = new MultipartFormDataContent();
+
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    formDataContent.Add(new StringContent(parameter.Value, Encoding.UTF8, "application/json"), parameter.Key);
+                }
+            }
+            formDataContent.Add(new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync(uri, formDataContent);
+
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return default(T);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        public AgentService GetAgentService(string serviceName)
+        {
+
+            //Get all services registered on Consul
+            var allRegisteredServices = _consulClient.Agent.Services().Result;
+
+            //Get all instance of the service went to send a request to
+            var registeredServices = allRegisteredServices.Response?.Where(s => s.Value.Service.Equals(serviceName, StringComparison.OrdinalIgnoreCase)).Select(x => x.Value).ToList();
+
+            if (registeredServices.Count < 1)
+            {
+                throw new Exception($"Consul service: '{serviceName}' was not found.");
+            }
+            //Get a random instance of the service
+            var service = GetRandomInstance(registeredServices, serviceName);
+
+            if (service == null)
+            {
+                throw new Exception($"Consul service: '{serviceName}' was not found.");
+            }
+
+            return service;
+        }
     }
 }

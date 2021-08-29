@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using AutoMapper;
 using Consul;
-using iread_interaction_ms.Web.Service;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Interface;
 using iread_school_ms.DataAccess.Repository;
 using iread_school_ms.Web.Profile;
 using iread_school_ms.Web.Service;
 using iread_school_ms.Web.Util;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -103,6 +103,42 @@ namespace iread_school_ms
                 config.AddProfile<AutoMapperProfile>();
             }).CreateMapper();
             services.AddSingleton(mapper);
+
+
+
+            // for protected APIs
+            var provider = services.BuildServiceProvider();
+            var consulHttpClientService = provider.GetRequiredService<IConsulHttpClientService>();
+            var identityService = consulHttpClientService.GetAgentService("identity_ms");
+            services.AddAuthentication("Bearer")
+            .AddIdentityServerAuthentication("Bearer", options =>
+            {
+                options.ApiName = "api1";
+                options.Authority = "http://" + identityService.Address + ":" + identityService.Port;
+                options.RequireHttpsMetadata = false;
+            });
+
+            services.AddAuthorization(options =>
+            {
+
+                options.AddPolicy(Policies.Administrator, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireScope(Policies.Administrator);
+                });
+                options.AddPolicy(Policies.Teacher, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireScope(Policies.Teacher);
+                });
+                options.AddPolicy(Policies.Student, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireScope(Policies.Student);
+                });
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
