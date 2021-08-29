@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using iread_interaction_ms.Web.Service;
 using iread_school_ms.Web.Service;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
