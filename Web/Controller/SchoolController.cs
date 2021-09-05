@@ -98,14 +98,14 @@ namespace iread_school_ms.Web.Controller
         [HttpGet("{id}/student/get")]
         public async Task<IActionResult> GetStudents([FromRoute] int id)
         {
-            List<SchoolMember> students = await _schoolService.GetStudents(id);
+            List<SchoolClassMemberDto> students = await _schoolService.GetStudents(id);
 
             if (students == null || students.Count == 0)
             {
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<List<SchoolMemberDto>>(students));
+            return Ok(students);
         }
 
 
@@ -113,14 +113,14 @@ namespace iread_school_ms.Web.Controller
         [HttpGet("{id}/teacher/get")]
         public async Task<IActionResult> GetTeachers([FromRoute] int id)
         {
-            List<SchoolMember> teachers = await _schoolService.GetTeachers(id);
+            List<SchoolClassMemberDto> teachers = await _schoolService.GetTeachers(id);
 
             if (teachers == null || teachers.Count == 0)
             {
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<List<SchoolMemberDto>>(teachers));
+            return Ok(teachers);
         }
 
 

@@ -30,6 +30,7 @@ namespace iread_school_ms.Web.Profile
             CreateMap<SchoolMember, ManagerDto>().ReverseMap();
             CreateMap<SchoolMemberDto, SchoolMember>().ReverseMap()
             .ForMember(dest => dest.Id, act => act.MapFrom(src => src.MemberId));
+            CreateMap<SchoolMember, SchoolClassMemberDto>();
         }
     }
 }

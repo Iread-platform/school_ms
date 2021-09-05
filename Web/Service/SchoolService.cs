@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
+using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.User;
 
 namespace iread_school_ms.Web.Service
 {
     public class SchoolService
     {
         private readonly IPublicRepository _publicRepository;
+        private readonly IMapper _mapper;
 
-        public SchoolService(IPublicRepository publicRepository)
+
+        public SchoolService(IPublicRepository publicRepository,
+        IMapper mapper)
         {
             _publicRepository = publicRepository;
+            _mapper = mapper;
         }
 
         public async Task<School> GetById(int id, bool includeClasses)
@@ -59,16 +66,23 @@ namespace iread_school_ms.Web.Service
             return await _publicRepository.GetSchoolMemberRepository.GetManagers(schoolId);
         }
 
-        internal async Task<List<SchoolMember>> GetStudents(int schoolId)
+        internal async Task<List<SchoolClassMemberDto>> GetStudents(int schoolId)
         {
-            return await _publicRepository.GetSchoolMemberRepository.GetStudents(schoolId);
-
+            var res = _mapper.Map<List<SchoolClassMemberDto>>(await _publicRepository.GetSchoolMemberRepository.GetStudents(schoolId));
+            res.ForEach(s => s.Classes = _mapper.Map<List<InnerClassDto>>
+            (_publicRepository.GetClassMemberRepository.GetByStudent(s.MemberId))
+            );
+            return res;
         }
 
-        internal async Task<List<SchoolMember>> GetTeachers(int schoolId)
+        internal async Task<List<SchoolClassMemberDto>> GetTeachers(int schoolId)
         {
-            return await _publicRepository.GetSchoolMemberRepository.GetTeachers(schoolId);
 
+            var res = _mapper.Map<List<SchoolClassMemberDto>>(await _publicRepository.GetSchoolMemberRepository.GetTeachers(schoolId));
+            res.ForEach(s => s.Classes = _mapper.Map<List<InnerClassDto>>
+            (_publicRepository.GetClassMemberRepository.GetByTeacher(s.MemberId))
+            );
+            return res;
         }
     }
 }
