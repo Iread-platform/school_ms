@@ -11,6 +11,7 @@ using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.User;
 using iread_school_ms.DataAccess.Data.Type;
 using System;
+using iread_school_ms.Web.Dto.SchoolMembers;
 using iread_school_ms.Web.Dto.UserDto;
 
 namespace iread_school_ms.Web.Controller
@@ -138,6 +139,21 @@ namespace iread_school_ms.Web.Controller
             }
 
             return Ok(_mapper.Map<List<InnerClassDto>>(classes));
+        }
+        
+        // GET: api/School/1/class/all
+        [HttpGet("getByMemberId/{memberId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByMemberId([FromRoute] string memberId)
+        {
+            SchoolMember schoolMember = await _schoolService.GetByMemberId(memberId);
+
+            if (schoolMember == null)
+            {
+                return NotFound();
+            }
+            return Ok(_mapper.Map<InnerSchoolMemberDto>(schoolMember)); 
         }
 
         // POST: api/School/1/class/add
