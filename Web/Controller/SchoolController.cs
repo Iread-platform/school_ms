@@ -234,7 +234,7 @@ namespace iread_school_ms.Web.Controller
             return NoContent();
         }
 
-        // POST: api/School/1/teacher/add
+        // POST: api/School/1/student/add
         [HttpPost("{id}/student/add")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -248,7 +248,7 @@ namespace iread_school_ms.Web.Controller
 
             SchoolMember studentMember = _mapper.Map<SchoolMember>(student);
             studentMember.SchoolId = id;
-            studentMember.SchoolMembershipType = SchoolMembershipType.Teacher.ToString();
+            studentMember.SchoolMembershipType = SchoolMembershipType.Student.ToString();
             ValidationLogicForAddMember(studentMember);
 
             if (ModelState.ErrorCount != 0)
