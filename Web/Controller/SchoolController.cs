@@ -206,6 +206,33 @@ namespace iread_school_ms.Web.Controller
 
             return NoContent();
         }
+        
+        // POST: api/School/1/teacher/add
+        [HttpPost("{id}/teacher/add")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult AddTeacherToSchool([FromBody] TeacherDto teacher, [FromRoute] int id)
+        {
+
+            if (teacher == null)
+            {
+                return BadRequest();
+            }
+
+            SchoolMember teacherMember = _mapper.Map<SchoolMember>(teacher);
+            teacherMember.SchoolId = id;
+            teacherMember.SchoolMembershipType = SchoolMembershipType.Teacher.ToString();
+            ValidationLogicForAddMember(teacherMember);
+
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            _schoolService.AddMember(teacherMember);
+
+            return NoContent();
+        }
 
         private void ValidationLogicForAddMember(SchoolMember managerMember)
         {
