@@ -1,6 +1,7 @@
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.School;
+using iread_school_ms.Web.Dto.SchoolMembers;
 using iread_school_ms.Web.Dto.User;
 
 namespace iread_school_ms.Web.Profile
@@ -28,6 +29,9 @@ namespace iread_school_ms.Web.Profile
 
             //School Member Mapper
             CreateMap<SchoolMember, ManagerDto>().ReverseMap();
+            CreateMap<SchoolMember, TeacherDto>().ReverseMap();
+            CreateMap<SchoolMember, StudentDto>().ReverseMap();
+            CreateMap<SchoolMember, InnerSchoolMemberDto>().ReverseMap();
             CreateMap<SchoolMemberDto, SchoolMember>().ReverseMap()
             .ForMember(dest => dest.Id, act => act.MapFrom(src => src.MemberId));
             CreateMap<SchoolMember, SchoolClassMemberDto>();

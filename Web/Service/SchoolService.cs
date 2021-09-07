@@ -24,7 +24,6 @@ namespace iread_school_ms.Web.Service
 
         public async Task<School> GetById(int id, bool includeClasses)
         {
-
             return await _publicRepository.GetSchoolRepo.GetById(id, includeClasses);
         }
 
@@ -83,6 +82,11 @@ namespace iread_school_ms.Web.Service
             (_publicRepository.GetClassMemberRepository.GetByTeacher(s.MemberId))
             );
             return res;
+        }
+
+        public async Task<SchoolMember> GetByMemberId(string memberId)
+        {
+            return await _publicRepository.GetSchoolMemberRepository.GetByMemberId(memberId);
         }
     }
 }

@@ -63,6 +63,9 @@ namespace iread_school_ms.DataAccess.Repository
             .ToListAsync();
         }
 
-
+        public async Task<SchoolMember> GetByMemberId(string memberId)
+        {
+            return await _context.SchoolMembers.Where(s => s.MemberId == memberId).FirstOrDefaultAsync();
+        }
     }
 }
