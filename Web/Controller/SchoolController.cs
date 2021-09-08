@@ -11,8 +11,10 @@ using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.User;
 using iread_school_ms.DataAccess.Data.Type;
 using System;
+using System.Linq;
 using iread_school_ms.Web.Dto.SchoolMembers;
 using iread_school_ms.Web.Dto.UserDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -123,7 +125,30 @@ namespace iread_school_ms.Web.Controller
 
             return Ok(teachers);
         }
+        
+        // GET: api/School/teacher/get
+        [HttpGet("teacher/get")]
+        [Authorize(Roles = Policies.SchoolManager,AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> GetTeachersByManagerToken()
+        {
+            int schoolId = int.Parse(User.Claims.Where(c => c.Type == "SchoolId").Select(c => c.Value).SingleOrDefault());
 
+            List<SchoolClassMemberDto> teachers = await _schoolService.GetTeachers(schoolId);
+            
+            return Ok(teachers);
+        }
+
+        // GET: api/School/student/get
+        [HttpGet("student/get")]
+        [Authorize(Roles = Policies.SchoolManager,AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> GetStudentsByManagerToken()
+        {
+            int schoolId = int.Parse(User.Claims.Where(c => c.Type == "SchoolId").Select(c => c.Value).SingleOrDefault());
+
+            List<SchoolClassMemberDto> students = await _schoolService.GetStudents(schoolId);
+            
+            return Ok(students);
+        }
 
         // GET: api/School/1/class/all
         [HttpGet("{id}/class/all")]
