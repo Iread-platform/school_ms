@@ -32,7 +32,7 @@ namespace iread_school_ms.Web.Profile
             CreateMap<SchoolMember, TeacherDto>().ReverseMap();
             CreateMap<SchoolMember, StudentDto>().ReverseMap();
             CreateMap<SchoolMember, InnerSchoolMemberDto>().ReverseMap();
-            CreateMap<SchoolMember, UpdateStudentDto>().ReverseMap();
+            CreateMap<SchoolMember, UpdateMemberDto>().ReverseMap();
             CreateMap<SchoolMemberDto, SchoolMember>().ReverseMap()
             .ForMember(dest => dest.Id, act => act.MapFrom(src => src.MemberId));
             CreateMap<SchoolMember, SchoolClassMemberDto>();

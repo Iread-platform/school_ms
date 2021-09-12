@@ -380,11 +380,11 @@ namespace iread_school_ms.Web.Controller
             return CreatedAtAction("GetById", new { id = schoolEntity.SchoolId }, _mapper.Map<SchoolDto>(schoolEntity));
         }
         
-        [HttpPut("UpdateStudentInfo/{studentId}")]
-        public async Task<IActionResult> UpdateStudentInfo([FromRoute] string studentId, [FromBody] UpdateStudentDto student)
+        [HttpPut("UpdateMemberInfo/{memberId}")]
+        public async Task<IActionResult> UpdateMemberInfo([FromRoute] string memberId, [FromBody] UpdateMemberDto member)
         {
 
-            if (student == null)
+            if (member == null)
             {
                 return BadRequest();
             }
@@ -394,15 +394,15 @@ namespace iread_school_ms.Web.Controller
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
 
-            SchoolMember studentEntity = _mapper.Map<SchoolMember>(student);
+            SchoolMember memberEntity = _mapper.Map<SchoolMember>(member);
             
-            SchoolMember oldStudent = await _schoolService.GetByMemberId(studentId);
-            if (oldStudent == null)
+            SchoolMember oldMember = await _schoolService.GetByMemberId(memberId);
+            if (oldMember == null)
             {
                 return NotFound();
             }
 
-            _schoolService.Update(studentEntity, oldStudent);
+            _schoolService.Update(memberEntity, oldMember);
             return NoContent();
         }
 

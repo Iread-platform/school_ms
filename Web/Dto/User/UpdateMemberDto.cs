@@ -2,7 +2,7 @@
 
 namespace iread_school_ms.Web.Dto.User
 {
-    public class UpdateStudentDto
+    public class UpdateMemberDto
     {
         [Required(AllowEmptyStrings = false)]
         public string FirstName { get; set; }
