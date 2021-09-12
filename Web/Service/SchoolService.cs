@@ -44,6 +44,10 @@ namespace iread_school_ms.Web.Service
             _publicRepository.GetSchoolRepo.Update(schoolEntity, oldSchool);
         }
 
+        internal void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember)
+        {
+            _publicRepository.GetSchoolMemberRepository.Update(schoolMemberEntity, oldSchoolMember);
+        }
 
         public void AddMember(SchoolMember schoolMember)
         {
@@ -88,5 +92,6 @@ namespace iread_school_ms.Web.Service
         {
             return await _publicRepository.GetSchoolMemberRepository.GetByMemberId(memberId);
         }
+        
     }
 }

@@ -67,5 +67,15 @@ namespace iread_school_ms.DataAccess.Repository
         {
             return await _context.SchoolMembers.Where(s => s.MemberId == memberId).FirstOrDefaultAsync();
         }
+
+        public void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember)
+        {
+            // _context.Entry(oldSchoolMember).State = EntityState.Deleted;
+            // _context.SchoolMembers.Attach(schoolMemberEntity);
+            // _context.Entry(schoolMemberEntity).State = EntityState.Modified;
+            oldSchoolMember.FirstName = schoolMemberEntity.FirstName;
+            oldSchoolMember.LastName = schoolMemberEntity.LastName;
+            _context.SaveChanges();
+        }
     }
 }

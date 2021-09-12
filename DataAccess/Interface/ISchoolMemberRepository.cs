@@ -16,5 +16,6 @@ namespace iread_school_ms.DataAccess.Interface
         public Task<List<SchoolMember>> GetStudents(int schoolId);
         public Task<List<SchoolMember>> GetTeachers(int schoolId);
         public Task<SchoolMember> GetByMemberId(string memberId);
+        public void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember);
     }
 }
