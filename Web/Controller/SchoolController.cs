@@ -180,6 +180,20 @@ namespace iread_school_ms.Web.Controller
             }
             return Ok(_mapper.Map<InnerSchoolMemberDto>(schoolMember)); 
         }
+        
+        [HttpGet]
+        [Route("myProfile")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> MyProfileAsync()
+        {
+            string myId = User.Claims.Where(c => c.Type == "sub")
+                .Select(c => c.Value).SingleOrDefault();
+
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"api/Identity/{myId}/get").GetAwaiter()
+                .GetResult();
+            
+            return Ok(user);
+        }
 
         // POST: api/School/1/class/add
         [HttpPost("{id}/class/add")]
