@@ -14,7 +14,7 @@ namespace iread_school_ms.Web.Util
         public const string Student = "Student";
         public const string SchoolManager = "SchoolManager";
 
-        public static AuthorizationPolicy AdmininstratorPolicy()
+        public static AuthorizationPolicy AdministratorPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser().RequireRole(Administrator).Build();
         }
