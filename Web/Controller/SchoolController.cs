@@ -180,7 +180,7 @@ namespace iread_school_ms.Web.Controller
             }
             return Ok(_mapper.Map<InnerSchoolMemberDto>(schoolMember)); 
         }
-
+        
         // POST: api/School/1/class/add
         [HttpPost("{id}/class/add")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
