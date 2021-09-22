@@ -65,5 +65,15 @@ namespace iread_school_ms.Web.Service
         {
             return  _publicRepository.GetClassRepository.ExistsStudent(memberId);
         }
+
+        public async Task<ClassMember> GetClassMemberById(int classMemberId)
+        {
+            return await _publicRepository.GetClassMemberRepository.GetById(classMemberId);
+        }
+
+        public void UpdateClassInClassMember(ClassMember oldClassMember)
+        {
+            _publicRepository.GetClassMemberRepository.Update(oldClassMember);
+        }
     }
 }

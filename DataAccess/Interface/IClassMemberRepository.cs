@@ -12,5 +12,6 @@ namespace iread_school_ms.DataAccess.Interface
         public void Insert(ClassMember classMember);
         public void Delete(ClassMember classMember);
 
+        public void Update(ClassMember classMember);
     }
 }
