@@ -225,8 +225,8 @@ namespace iread_school_ms.Web.Controller
         private void ValidationLogicForAddStudent(ClassMember member)
         {
 
-            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get")
-                .Result;
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").GetAwaiter().GetResult();
+            
             if (user == null)
             {
                 ModelState.AddModelError("User", "User not found");
