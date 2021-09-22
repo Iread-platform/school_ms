@@ -96,7 +96,30 @@ namespace iread_school_ms.Web.Controller
             return NoContent();
         }
 
+        [HttpPut("edit-student-class")]
+        public IActionResult EditStudentClass([FromBody] UpdateStudentClassDto student)
+        {
+            if (student == null)
+            {
+                return BadRequest();
+            }
+            
+            ClassMember oldClassMember = _classService.GetClassMemberById(student.ClassMemberId).GetAwaiter().GetResult();
+            
+            ValidationLogicForUpdateStudentClass(oldClassMember, student);
+            
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
 
+            oldClassMember.ClassId = student.ClassId;
+
+            _classService.UpdateClassInClassMember(oldClassMember);
+
+            return NoContent();
+        }
+        
 
         [HttpPut("{id}/add-teacher")]
         public IActionResult AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
@@ -261,6 +284,27 @@ namespace iread_school_ms.Web.Controller
                     member.Class = classObj;
                 }
 
+            }
+        }
+        
+        private void ValidationLogicForUpdateStudentClass(ClassMember oldClassMember, UpdateStudentClassDto student)
+        {
+            if (oldClassMember == null)
+            {
+                ModelState.AddModelError("ClassMember", "Class member not found.");
+            }
+            else
+            {
+                if (oldClassMember.ClassMembershipType != Policies.Student)
+                {
+                    ModelState.AddModelError("Role", "This class member is not for a student account.");
+                }
+            }
+            
+            Class classObj = _classService.GetById(student.ClassId,false).GetAwaiter().GetResult();
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
             }
         }
         

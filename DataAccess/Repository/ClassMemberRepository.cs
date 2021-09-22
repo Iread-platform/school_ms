@@ -38,6 +38,12 @@ namespace iread_school_ms.DataAccess.Repository
             _context.SaveChanges();
         }
 
+        public void Update(ClassMember classMember)
+        {
+            _context.ClassMembers.Update(classMember);
+            _context.SaveChanges();
+        }
+
         public List<Class> GetByStudent(string studentId)
         {
             return _context.ClassMembers
