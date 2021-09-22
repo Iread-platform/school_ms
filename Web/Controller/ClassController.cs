@@ -14,7 +14,6 @@ using System.Collections.Generic;
 
 namespace iread_school_ms.Web.Controller
 {
-
     [ApiController]
     [Route("api/School/[controller]/")]
     public class ClassController : ControllerBase
@@ -103,11 +102,12 @@ namespace iread_school_ms.Web.Controller
             {
                 return BadRequest();
             }
-            
-            ClassMember oldClassMember = _classService.GetClassMemberById(student.ClassMemberId).GetAwaiter().GetResult();
-            
+
+            ClassMember oldClassMember =
+                _classService.GetClassMemberById(student.ClassMemberId).GetAwaiter().GetResult();
+
             ValidationLogicForUpdateStudentClass(oldClassMember, student);
-            
+
             if (ModelState.ErrorCount != 0)
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
@@ -119,7 +119,7 @@ namespace iread_school_ms.Web.Controller
 
             return NoContent();
         }
-        
+
 
         [HttpPut("{id}/add-teacher")]
         public IActionResult AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
@@ -146,6 +146,31 @@ namespace iread_school_ms.Web.Controller
             schoolMember.SchoolId = teacherMember.Class.SchoolId;
             schoolMember.SchoolMembershipType = SchoolMembershipType.Teacher.ToString();
             _schoolService.AddMember(schoolMember);
+
+            return NoContent();
+        }
+
+        [HttpPut("edit-teacher-class")]
+        public IActionResult EditTeacherClass([FromBody] UpdateTeacherClassDto teacher)
+        {
+            if (teacher == null)
+            {
+                return BadRequest();
+            }
+
+            ClassMember oldClassMember =
+                _classService.GetClassMemberById(teacher.ClassMemberId).GetAwaiter().GetResult();
+
+            ValidationLogicForUpdateTeacherClass(oldClassMember, teacher);
+
+            if (ModelState.ErrorCount != 0)
+            {
+                return BadRequest(ErrorMessage.ModelStateParser(ModelState));
+            }
+
+            oldClassMember.ClassId = teacher.ClassId;
+
+            _classService.UpdateClassInClassMember(oldClassMember);
 
             return NoContent();
         }
@@ -201,11 +226,9 @@ namespace iread_school_ms.Web.Controller
         }
 
 
-
         private void ValidationLogicForAddTeacher(ClassMember member)
 
         {
-
             UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get")
                 .Result;
             if (user == null)
@@ -223,7 +246,6 @@ namespace iread_school_ms.Web.Controller
                     member.FirstName = user.FirstName;
                     member.LastName = user.LastName;
                 }
-
             }
 
             Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
@@ -241,15 +263,14 @@ namespace iread_school_ms.Web.Controller
                 {
                     member.Class = classObj;
                 }
-
             }
         }
 
         private void ValidationLogicForAddStudent(ClassMember member)
         {
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get")
+                .GetAwaiter().GetResult();
 
-            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").GetAwaiter().GetResult();
-            
             if (user == null)
             {
                 ModelState.AddModelError("User", "User not found");
@@ -265,7 +286,6 @@ namespace iread_school_ms.Web.Controller
                     member.FirstName = user.FirstName;
                     member.LastName = user.LastName;
                 }
-
             }
 
             Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
@@ -283,10 +303,9 @@ namespace iread_school_ms.Web.Controller
                 {
                     member.Class = classObj;
                 }
-
             }
         }
-        
+
         private void ValidationLogicForUpdateStudentClass(ClassMember oldClassMember, UpdateStudentClassDto student)
         {
             if (oldClassMember == null)
@@ -300,13 +319,41 @@ namespace iread_school_ms.Web.Controller
                     ModelState.AddModelError("Role", "This class member is not for a student account.");
                 }
             }
-            
-            Class classObj = _classService.GetById(student.ClassId,false).GetAwaiter().GetResult();
+
+            Class classObj = _classService.GetById(student.ClassId, false).GetAwaiter().GetResult();
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
             }
         }
-        
+
+        private void ValidationLogicForUpdateTeacherClass(ClassMember oldClassMember, UpdateTeacherClassDto teacher)
+        {
+            if (oldClassMember == null)
+            {
+                ModelState.AddModelError("ClassMember", "Class member not found.");
+            }
+            else
+            {
+                if (oldClassMember.ClassMembershipType != Policies.Teacher)
+                {
+                    ModelState.AddModelError("Role", "This class member is not for a teacher account.");
+                }
+            }
+
+            Class classObj = _classService.GetById(teacher.ClassId, true).GetAwaiter().GetResult();
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
+            }
+
+            if (classObj != null && oldClassMember != null)
+            {
+                if (classObj.Members.Find(m => m.MemberId == oldClassMember.MemberId && m.ClassId == teacher.ClassId) != null)
+                {
+                    ModelState.AddModelError("Member", "User already exists in this class");
+                }
+            }
+        }
     }
 }
