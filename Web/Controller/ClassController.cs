@@ -25,8 +25,8 @@ namespace iread_school_ms.Web.Controller
         private readonly IConsulHttpClientService _consulHttpClient;
 
         public ClassController(ClassService classService, IMapper mapper,
-        SchoolService schoolService,
-          IConsulHttpClientService consulHttpClient)
+            SchoolService schoolService,
+            IConsulHttpClientService consulHttpClient)
         {
             _classService = classService;
             _mapper = mapper;
@@ -77,7 +77,7 @@ namespace iread_school_ms.Web.Controller
             ClassMember studentMember = _mapper.Map<ClassMember>(student);
             studentMember.ClassId = id;
             studentMember.ClassMembershipType = ClassMembershipType.Student.ToString();
-            ValidationLogicForAddMember(studentMember);
+            ValidationLogicForAddStudent(studentMember);
 
             if (ModelState.ErrorCount != 0)
             {
@@ -109,7 +109,7 @@ namespace iread_school_ms.Web.Controller
             ClassMember teacherMember = _mapper.Map<ClassMember>(teacher);
             teacherMember.ClassId = id;
             teacherMember.ClassMembershipType = ClassMembershipType.Teacher.ToString();
-            ValidationLogicForAddMember(teacherMember);
+            ValidationLogicForAddTeacher(teacherMember);
 
             if (ModelState.ErrorCount != 0)
             {
@@ -135,11 +135,13 @@ namespace iread_school_ms.Web.Controller
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
+
             var classObj = _classService.GetById(id, false).Result;
             if (classObj == null)
             {
                 return NotFound();
             }
+
             if (classObj.Archived)
             {
                 ModelState.AddModelError("Archive", "class already archived");
@@ -158,11 +160,13 @@ namespace iread_school_ms.Web.Controller
             {
                 return BadRequest(ErrorMessage.ModelStateParser(ModelState));
             }
+
             var classObj = _classService.GetById(id, false).Result;
             if (classObj == null)
             {
                 return NotFound();
             }
+
             if (!classObj.Archived)
             {
                 ModelState.AddModelError("Archive", "class already unarchived");
@@ -175,11 +179,12 @@ namespace iread_school_ms.Web.Controller
 
 
 
-        private void ValidationLogicForAddMember(ClassMember member)
+        private void ValidationLogicForAddTeacher(ClassMember member)
 
         {
 
-            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").Result;
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get")
+                .Result;
             if (user == null)
             {
                 ModelState.AddModelError("User", "User not found");
@@ -198,7 +203,7 @@ namespace iread_school_ms.Web.Controller
 
             }
 
-            Class classObj = _classService.GetById((int)member.ClassId, true).Result;
+            Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
@@ -217,7 +222,47 @@ namespace iread_school_ms.Web.Controller
             }
         }
 
+        private void ValidationLogicForAddStudent(ClassMember member)
+        {
 
+            UserDto user = _consulHttpClient.GetAsync<UserDto>("identity_ms", $"/api/Identity/{member.MemberId}/get").GetAwaiter().GetResult();
+            
+            if (user == null)
+            {
+                ModelState.AddModelError("User", "User not found");
+            }
+            else
+            {
+                if (user.Role != member.ClassMembershipType)
+                {
+                    ModelState.AddModelError("User", $"User not {member.ClassMembershipType}");
+                }
+                else
+                {
+                    member.FirstName = user.FirstName;
+                    member.LastName = user.LastName;
+                }
+
+            }
+
+            Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
+            if (classObj == null)
+            {
+                ModelState.AddModelError("Class", "Class not found");
+            }
+            else
+            {
+                if (_classService.ExistsStudent(member.MemberId))
+                {
+                    ModelState.AddModelError("Member", "User already exists in author class");
+                }
+                else
+                {
+                    member.Class = classObj;
+                }
+
+            }
+        }
+        
     }
-
 }
