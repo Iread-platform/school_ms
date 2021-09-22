@@ -320,10 +320,18 @@ namespace iread_school_ms.Web.Controller
                 }
             }
 
-            Class classObj = _classService.GetById(student.ClassId, false).GetAwaiter().GetResult();
+            Class classObj = _classService.GetById(student.ClassId, true).GetAwaiter().GetResult();
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
+            }
+            
+            if (classObj != null && oldClassMember != null)
+            {
+                if (classObj.Members.Find(m => m.MemberId == oldClassMember.MemberId) != null)
+                {
+                    ModelState.AddModelError("Member", "User already exists in this class");
+                }
             }
         }
 
@@ -349,7 +357,7 @@ namespace iread_school_ms.Web.Controller
 
             if (classObj != null && oldClassMember != null)
             {
-                if (classObj.Members.Find(m => m.MemberId == oldClassMember.MemberId && m.ClassId == teacher.ClassId) != null)
+                if (classObj.Members.Find(m => m.MemberId == oldClassMember.MemberId) != null)
                 {
                     ModelState.AddModelError("Member", "User already exists in this class");
                 }
