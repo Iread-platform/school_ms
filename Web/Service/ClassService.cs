@@ -60,5 +60,10 @@ namespace iread_school_ms.Web.Service
         {
             return await _publicRepository.GetClassRepository.GetAll();
         }
+
+        public bool ExistsStudent(string memberId)
+        {
+            return  _publicRepository.GetClassRepository.ExistsStudent(memberId);
+        }
     }
 }

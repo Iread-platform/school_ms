@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
+using iread_school_ms.Web.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace iread_school_ms.DataAccess.Repository
@@ -22,9 +23,14 @@ namespace iread_school_ms.DataAccess.Repository
             return await _context.Classes.ToListAsync();
         }
 
-        public async Task<Class> GetById(int id, bool includeMambers)
+        public bool ExistsStudent(string memberId)
         {
-            if (includeMambers)
+            return _context.ClassMembers.Any(m => m.MemberId == memberId);
+        }
+
+        public async Task<Class> GetById(int id, bool includeMembers)
+        {
+            if (includeMembers)
                 return await _context.Classes
                 .Include(c => c.School)
                 .Include(c => c.Members)

@@ -23,5 +23,6 @@ namespace iread_school_ms.DataAccess.Interface
         public void Update(Class classEntity, Class oldClass);
         public void ArchiveBySchool(int schoolId);
         public Task<List<Class>> GetAll();
+        bool ExistsStudent(string memberId);
     }
 }
