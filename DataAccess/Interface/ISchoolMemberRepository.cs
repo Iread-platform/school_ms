@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data.Entity;
+using iread_school_ms.Web.Dto.School;
 
 namespace iread_school_ms.DataAccess.Interface
 {
@@ -16,6 +18,7 @@ namespace iread_school_ms.DataAccess.Interface
         public Task<List<SchoolMember>> GetStudents(int schoolId);
         public Task<List<SchoolMember>> GetTeachers(int schoolId);
         public Task<SchoolMember> GetByMemberId(string memberId);
+        public IQueryable<SchoolAndClassDto> GetSchoolAndClassId(string memberId);
         public void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember);
     }
 }

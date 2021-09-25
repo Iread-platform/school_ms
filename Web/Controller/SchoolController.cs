@@ -172,13 +172,13 @@ namespace iread_school_ms.Web.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByMemberId([FromRoute] string memberId)
         {
-            SchoolMember schoolMember = await _schoolService.GetByMemberId(memberId);
+            IQueryable<SchoolAndClassDto> schoolMember =  _schoolService.GetSchoolAndClassId(memberId);
 
             if (schoolMember == null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<InnerSchoolMemberDto>(schoolMember)); 
+            return Ok(schoolMember); 
         }
         
         // POST: api/School/1/class/add
@@ -396,7 +396,7 @@ namespace iread_school_ms.Web.Controller
 
             SchoolMember memberEntity = _mapper.Map<SchoolMember>(member);
             
-            SchoolMember oldMember = await _schoolService.GetByMemberId(memberId);
+            SchoolMember oldMember = _schoolService.GetByMemberId(memberId).GetAwaiter().GetResult();
             if (oldMember == null)
             {
                 return NotFound();

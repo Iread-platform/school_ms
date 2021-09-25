@@ -5,6 +5,8 @@ using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Interface;
+using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.School;
 using Microsoft.EntityFrameworkCore;
 
 namespace iread_school_ms.DataAccess.Repository
@@ -65,9 +67,43 @@ namespace iread_school_ms.DataAccess.Repository
 
         public async Task<SchoolMember> GetByMemberId(string memberId)
         {
-            return await _context.SchoolMembers.Where(s => s.MemberId == memberId).FirstOrDefaultAsync();
+            return await _context.SchoolMembers
+                .Where(s => s.MemberId == memberId)
+                .FirstOrDefaultAsync();
         }
+        public IQueryable<SchoolAndClassDto> GetSchoolAndClassId(string memberId)
+        {
+            
+            var student = from st in (from sm in _context.SchoolMembers
+                join cm in _context.ClassMembers on sm.MemberId equals cm.MemberId
+                join s in _context.Schools on sm.SchoolId equals s.SchoolId
+                join c in _context.Classes on cm.ClassId equals c.ClassId
+                where sm.MemberId == memberId
+                select new
+                {
+                    SchoolId = s.SchoolId,
+                    ClassId = c.ClassId,
+                    ClassTitle = c.Title,
+                    SchoolTitle = s.Title,
+                    Archived = c.Archived
+                }).AsEnumerable()
+                group new InnerClassDto
+                {
+                    ClassId = st.ClassId,
+                    Title = st.ClassTitle,
+                    Archived = st.Archived
+                } by new{st.SchoolId,st.SchoolTitle}  into g
+                select new SchoolAndClassDto
+                {
+                    SchoolId = g.Key.SchoolId,
+                    SchoolTitle = g.Key.SchoolTitle,
+                    Classes = g.ToList()
+                };  
 
+            return student.AsQueryable();
+
+        }
+        
         public void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember)
         {
             // _context.Entry(oldSchoolMember).State = EntityState.Deleted;
