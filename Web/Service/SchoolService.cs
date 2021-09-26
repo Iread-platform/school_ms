@@ -90,7 +90,7 @@ namespace iread_school_ms.Web.Service
             return res;
         }
 
-        public IQueryable<SchoolAndClassDto> GetSchoolAndClassId(string memberId)
+        public SchoolAndClassDto GetSchoolAndClassId(string memberId)
         {
             return  _publicRepository.GetSchoolMemberRepository.GetSchoolAndClassId(memberId);
         }

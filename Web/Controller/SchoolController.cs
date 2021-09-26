@@ -172,7 +172,7 @@ namespace iread_school_ms.Web.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByMemberId([FromRoute] string memberId)
         {
-            IQueryable<SchoolAndClassDto> schoolMember =  _schoolService.GetSchoolAndClassId(memberId);
+            SchoolAndClassDto schoolMember =  _schoolService.GetSchoolAndClassId(memberId);
 
             if (schoolMember == null)
             {
