@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Interface;
 using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.School;
 using iread_school_ms.Web.Dto.User;
 
 namespace iread_school_ms.Web.Service
@@ -88,6 +90,11 @@ namespace iread_school_ms.Web.Service
             return res;
         }
 
+        public SchoolAndClassDto GetSchoolAndClassId(string memberId)
+        {
+            return  _publicRepository.GetSchoolMemberRepository.GetSchoolAndClassId(memberId);
+        }
+        
         public async Task<SchoolMember> GetByMemberId(string memberId)
         {
             return await _publicRepository.GetSchoolMemberRepository.GetByMemberId(memberId);

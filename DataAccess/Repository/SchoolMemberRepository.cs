@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using iread_school_ms.DataAccess.Data;
 using iread_school_ms.DataAccess.Data.Entity;
 using iread_school_ms.DataAccess.Data.Type;
 using iread_school_ms.DataAccess.Interface;
+using iread_school_ms.Web.Dto.Class;
+using iread_school_ms.Web.Dto.School;
 using Microsoft.EntityFrameworkCore;
 
 namespace iread_school_ms.DataAccess.Repository
@@ -65,9 +68,47 @@ namespace iread_school_ms.DataAccess.Repository
 
         public async Task<SchoolMember> GetByMemberId(string memberId)
         {
-            return await _context.SchoolMembers.Where(s => s.MemberId == memberId).FirstOrDefaultAsync();
+            return await _context.SchoolMembers
+                .Where(s => s.MemberId == memberId)
+                .Include(s => s.School)
+                .FirstOrDefaultAsync();
         }
-
+        public SchoolAndClassDto GetSchoolAndClassId(string memberId)
+        {
+            var student = from st in (from sm in _context.SchoolMembers
+                    join s in _context.Schools on sm.SchoolId equals s.SchoolId //inner join with school
+                    join cm in _context.ClassMembers on sm.MemberId equals cm.MemberId into classMembers //left join with class member
+                    from subpet in classMembers.DefaultIfEmpty() //left join result
+                    join c in _context.Classes on subpet.ClassId equals c.ClassId into classes//left join with class
+                    from subpetClasses in classes.DefaultIfEmpty() //left join result
+                    where sm.MemberId == memberId
+                    select new
+                    {
+                        SchoolId = s.SchoolId,
+                        ClassId = subpetClasses != null? subpetClasses.ClassId : -1,
+                        ClassTitle = subpetClasses != null? subpetClasses.Title : String.Empty,
+                        SchoolTitle = s.Title,
+                        Archived = subpetClasses != null && subpetClasses.Archived,
+                        SchoolMembershipType = sm.SchoolMembershipType
+                    }).AsEnumerable()
+                   group new InnerClassDto
+                    {
+                       Title = st.ClassTitle,
+                       ClassId = st.ClassId,
+                       Archived = st.Archived
+                    } by new{st.SchoolId,st.SchoolTitle, st.SchoolMembershipType}  into g
+                    select new SchoolAndClassDto
+                    {
+                        SchoolId = g.Key.SchoolId,
+                        SchoolTitle = g.Key.SchoolTitle,
+                        SchoolMembershipType = g.Key.SchoolMembershipType,
+                        Classes = g.ToList()
+                    };
+            
+            return student.First();
+            
+        }
+        
         public void Update(SchoolMember schoolMemberEntity, SchoolMember oldSchoolMember)
         {
             // _context.Entry(oldSchoolMember).State = EntityState.Deleted;
