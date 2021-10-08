@@ -205,10 +205,10 @@ namespace iread_school_ms.Web.Controller
             _classService.Insert(classEntity);
 
             // NOTIFICATION_MS
-            // Add school class topic
+            // add the class topic
             try
             {
-                AddTopicDto topic = await CreateTopic(NotificationUtil.ClassTopicTitle(classEntity));
+                AddTopicDto topic = await CreateTopic(classEntity.School.Title + classEntity.Title);
             }
             catch (Exception e)
             {
@@ -271,15 +271,12 @@ namespace iread_school_ms.Web.Controller
             _schoolService.AddMember(teacherMember);
 
             // NOTIFICATION_MS
-            // Add teacher to database.
             // subscribe to the school topic
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(teacherMember.MemberId);
-                if (addNotificationUserDto != null && addNotificationUserDto.UserId != null)
-                {
-                    TopicSubscribeDto topic = await subscribeToTopic(NotificationUtil.SchoolTeachersTopicTitle(teacherMember.School), new List<string>() { teacherMember.MemberId });
-                }
+                List<string> useres = new List<string>();
+                useres.Add(teacherMember.MemberId);
+                TopicSubscribeDto topic = await subscribeToTopic(teacherMember.School.Title, useres);
             }
             catch (Exception e)
             {
@@ -313,13 +310,12 @@ namespace iread_school_ms.Web.Controller
             _schoolService.AddMember(studentMember);
 
             // NOTIFICATION_MS
-            // Add student for the first time to notifications ms db.
             // supscripe to the school topics 
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(studentMember.MemberId);
-                TopicSubscribeDto topic = await subscribeToTopic(NotificationUtil.SchoolTopicTitle(studentMember.School), new List<string>() { studentMember.MemberId });
-
+                List<string> useres = new List<string>();
+                useres.Add(studentMember.MemberId);
+                TopicSubscribeDto topic = await subscribeToTopic(studentMember.School.Title, useres);
             }
             catch (Exception e)
             {
@@ -423,7 +419,7 @@ namespace iread_school_ms.Web.Controller
             // create a topic for the school. 
             try
             {
-                AddTopicDto topic = await CreateTopic(NotificationUtil.SchoolTopicTitle(schoolEntity));
+                AddTopicDto topic = await CreateTopic(schoolEntity.Title);
             }
             catch (Exception e)
             {
@@ -551,7 +547,11 @@ namespace iread_school_ms.Web.Controller
 
         private async Task<AddTopicDto> CreateTopic(string topicName)
         {
-            AddTopicDto response = new AddTopicDto() { Title = topicName };
+            Regex rgx = new Regex(@"[a-zA-Z0-9-_.~%]+");
+
+            var cahrs = topicName.Where((character) => rgx.IsMatch(character.ToString()));
+            string processedName = new string(cahrs.ToArray());
+            AddTopicDto response = new AddTopicDto() { Title = processedName };
             response = await _consulHttpClient.PostBodyAsync<AddTopicDto>("notifications_ms", $"/api/Topic/Add",
              response);
 
@@ -562,15 +562,6 @@ namespace iread_school_ms.Web.Controller
         {
             TopicSubscribeDto response = new TopicSubscribeDto() { TopicTitle = topicName, Users = users };
             response = await _consulHttpClient.PostBodyAsync<TopicSubscribeDto>("notifications_ms", $"/api/Topic/Subscribe",
-             response);
-
-            return response;
-        }
-
-        private async Task<AddNotificationUserDto> AddUser(string memberId)
-        {
-            AddNotificationUserDto response = new AddNotificationUserDto() { UserId = memberId };
-            response = await _consulHttpClient.PostBodyAsync<AddNotificationUserDto>("notifications_ms", $"/api/User/Add",
              response);
 
             return response;
