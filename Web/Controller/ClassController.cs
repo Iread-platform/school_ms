@@ -9,8 +9,12 @@ using iread_school_ms.Web.Dto.Class;
 using iread_school_ms.Web.Dto.User;
 using System;
 using iread_school_ms.Web.Dto.UserDto;
+using iread_school_ms.Web.Dto.Notification;
+using iread_school_ms.Web.Dto.Topic;
 using iread_school_ms.DataAccess.Data.Type;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace iread_school_ms.Web.Controller
 {
@@ -66,7 +70,7 @@ namespace iread_school_ms.Web.Controller
 
 
         [HttpPut("{id}/add-student")]
-        public IActionResult AddStudent([FromBody] StudentDto student, [FromRoute] int id)
+        public async Task<IActionResult> AddStudent([FromBody] StudentDto student, [FromRoute] int id)
         {
             if (student == null)
             {
@@ -91,7 +95,19 @@ namespace iread_school_ms.Web.Controller
             schoolMember.SchoolMembershipType = SchoolMembershipType.Student.ToString();
             _schoolService.AddMember(schoolMember);
 
+            // NOTIFICATION_MS
+            // Add student for the first time to notifications ms db.
+            // supscripe to the class topic. 
+            try
+            {
+                AddNotificationUserDto addNotificationUserDto = await AddUser(studentMember.MemberId);
+                TopicSubscribeDto topicSubscribeDto = await subscribeToTopic(NotificationUtil.ClassTopicTitle(studentMember.Class), new List<string>() { studentMember.MemberId });
 
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.ToString());
+            }
             return NoContent();
         }
 
@@ -122,7 +138,7 @@ namespace iread_school_ms.Web.Controller
 
 
         [HttpPut("{id}/add-teacher")]
-        public IActionResult AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
+        public async Task<IActionResult> AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
         {
             if (teacher == null)
             {
@@ -147,6 +163,19 @@ namespace iread_school_ms.Web.Controller
             schoolMember.SchoolMembershipType = SchoolMembershipType.Teacher.ToString();
             _schoolService.AddMember(schoolMember);
 
+            // NOTIFICATION_MS
+            // Add teacher for the first time to notifications ms db.
+            // supscripe to the class teacher topic. 
+            try
+            {
+                AddNotificationUserDto addNotificationUserDto = await AddUser(teacherMember.MemberId);
+                TopicSubscribeDto topicSubscribeDto = await subscribeToTopic(NotificationUtil.ClassTeachersTopicTitle(teacherMember.Class), new List<string>() { teacherMember.MemberId });
+
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.ToString());
+            }
             return NoContent();
         }
 
@@ -248,7 +277,7 @@ namespace iread_school_ms.Web.Controller
                 }
             }
 
-            Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
+            Class classObj = _classService.GetById((int)member.ClassId, true).GetAwaiter().GetResult();
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
@@ -288,7 +317,7 @@ namespace iread_school_ms.Web.Controller
                 }
             }
 
-            Class classObj = _classService.GetById((int) member.ClassId, true).GetAwaiter().GetResult();
+            Class classObj = _classService.GetById((int)member.ClassId, true).GetAwaiter().GetResult();
             if (classObj == null)
             {
                 ModelState.AddModelError("Class", "Class not found");
@@ -325,7 +354,7 @@ namespace iread_school_ms.Web.Controller
             {
                 ModelState.AddModelError("Class", "Class not found");
             }
-            
+
             if (classObj != null && oldClassMember != null)
             {
                 if (classObj.Members.Find(m => m.MemberId == oldClassMember.MemberId) != null)
@@ -362,6 +391,53 @@ namespace iread_school_ms.Web.Controller
                     ModelState.AddModelError("Member", "User already exists in this class");
                 }
             }
+        }
+        private async Task<SingletNotificationDto> SendSingleNotification(string title, string body, int userId, string message, string route)
+        {
+            SingletNotificationDto response = new SingletNotificationDto() { Body = body, UserId = 1, Title = title, ExtraData = new ExtraDataDto() { GoTo = route, Messsage = message } };
+            response = await _consulHttpClient.PostBodyAsync<SingletNotificationDto>("notifications_ms", $"/api/Notification/Send",
+             response);
+
+            return response;
+        }
+
+        private async Task<TopicNotificationAddDto> SendTopicNotification(string title, string body, string topicName, string message, string route)
+        {
+            TopicNotificationAddDto response = new TopicNotificationAddDto() { Body = body, TopicName = topicName, Title = title, ExtraData = new ExtraDataDto() { GoTo = route, Messsage = message } };
+            response = await _consulHttpClient.PostBodyAsync<TopicNotificationAddDto>("notifications_ms", $"/api/Notification/broadcast-by-topic-title",
+             response);
+
+            return response;
+        }
+
+        private async Task<AddTopicDto> CreateTopic(string topicName)
+        {
+            Regex rgx = new Regex(@"[a-zA-Z0-9-_.~%]+");
+            var cahrs = topicName.Where((character) => rgx.IsMatch(character.ToString()));
+            string processedName = new string(cahrs.ToArray());
+            AddTopicDto response = new AddTopicDto() { Title = processedName };
+            response = await _consulHttpClient.PostBodyAsync<AddTopicDto>("notifications_ms", $"/api/Topic/Add",
+             response);
+
+            return response;
+        }
+
+        private async Task<TopicSubscribeDto> subscribeToTopic(string topicName, List<string> users)
+        {
+            TopicSubscribeDto response = new TopicSubscribeDto() { TopicTitle = topicName, Users = users };
+            response = await _consulHttpClient.PostBodyAsync<TopicSubscribeDto>("notifications_ms", $"/api/Topic/Subscribe",
+             response);
+
+            return response;
+        }
+
+        private async Task<AddNotificationUserDto> AddUser(string memberId)
+        {
+            AddNotificationUserDto response = new AddNotificationUserDto() { UserId = memberId };
+            response = await _consulHttpClient.PostBodyAsync<AddNotificationUserDto>("notifications_ms", $"/api/User/Add",
+             response);
+
+            return response;
         }
     }
 }
