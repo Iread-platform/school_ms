@@ -1,6 +1,6 @@
 using System;
 
-namespace iread_assignment_ms.Web.Dto.Notification
+namespace iread_school_ms.Web.Dto.Notification
 {
     public class ExtraDataDto
     {

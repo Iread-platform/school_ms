@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace iread_assignment_ms.Web.Dto.Topic
+namespace iread_school_ms.Web.Dto.Topic
 {
     public class AddTopicDto
     {
