@@ -549,10 +549,9 @@ namespace iread_school_ms.Web.Controller
         {
             Regex rgx = new Regex(@"[a-zA-Z0-9-_.~%]+");
 
-            MatchCollection matchesCollection = rgx.Matches(topicName);
             var cahrs = topicName.Where((character) => rgx.IsMatch(character.ToString()));
             string processedName = new string(cahrs.ToArray());
-            AddTopicDto response = new AddTopicDto() { Title = topicName };
+            AddTopicDto response = new AddTopicDto() { Title = processedName };
             response = await _consulHttpClient.PostBodyAsync<AddTopicDto>("notifications_ms", $"/api/Topic/Add",
              response);
 
