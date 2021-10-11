@@ -209,6 +209,7 @@ namespace iread_school_ms.Web.Controller
             try
             {
                 AddTopicDto topic = await CreateTopic(NotificationUtil.ClassTopicTitle(classEntity));
+                AddTopicDto teacherTopic = await CreateTopic(NotificationUtil.ClassTeachersTopicTitle(classEntity));
             }
             catch (Exception e)
             {
@@ -424,6 +425,7 @@ namespace iread_school_ms.Web.Controller
             try
             {
                 AddTopicDto topic = await CreateTopic(NotificationUtil.SchoolTopicTitle(schoolEntity));
+                AddTopicDto tteachersTopic = await CreateTopic(NotificationUtil.SchoolTeachersTopicTitle(schoolEntity));
             }
             catch (Exception e)
             {
