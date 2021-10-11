@@ -17,7 +17,7 @@ namespace iread_school_ms.Web.Util
 
         public static string ClassTopicTitle(Class obj)
         {
-            return ProcessTopicName(new string(obj.ClassId + obj.SchoolId + obj.Title));
+            return ProcessTopicName(new string(obj.ClassId + obj.Title));
         }
 
 
