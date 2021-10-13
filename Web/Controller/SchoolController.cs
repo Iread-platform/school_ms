@@ -189,7 +189,7 @@ namespace iread_school_ms.Web.Controller
         [HttpPost("{id}/class/add")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddClassToSchool([FromBody] ClassCreateDto classObj, [FromRoute] int id)
+        public IActionResult AddClassToSchool([FromBody] ClassCreateDto classObj, [FromRoute] int id)
         {
 
             School school = _schoolService.GetById(id, false).Result;
@@ -208,8 +208,8 @@ namespace iread_school_ms.Web.Controller
             // Add school class topic
             try
             {
-                AddTopicDto topic = await CreateTopic(NotificationUtil.ClassTopicTitle(classEntity));
-                AddTopicDto teacherTopic = await CreateTopic(NotificationUtil.ClassTeachersTopicTitle(classEntity));
+                AddTopicDto topic = CreateTopic(NotificationUtil.ClassTopicTitle(classEntity)).GetAwaiter().GetResult();
+                AddTopicDto teacherTopic = CreateTopic(NotificationUtil.ClassTeachersTopicTitle(classEntity)).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {
@@ -251,7 +251,7 @@ namespace iread_school_ms.Web.Controller
         [HttpPost("{id}/teacher/add")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddTeacherToSchool([FromBody] TeacherDto teacher, [FromRoute] int id)
+        public IActionResult AddTeacherToSchool([FromBody] TeacherDto teacher, [FromRoute] int id)
         {
 
             if (teacher == null)
@@ -276,10 +276,10 @@ namespace iread_school_ms.Web.Controller
             // subscribe to the school topic
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(teacherMember.MemberId);
+                AddNotificationUserDto addNotificationUserDto = AddUser(teacherMember.MemberId).GetAwaiter().GetResult();
                 if (addNotificationUserDto != null && addNotificationUserDto.UserId != null)
                 {
-                    TopicSubscribeDto topic = await subscribeToTopic(NotificationUtil.SchoolTeachersTopicTitle(teacherMember.School), new List<string>() { teacherMember.MemberId });
+                    TopicSubscribeDto topic = subscribeToTopic(NotificationUtil.SchoolTeachersTopicTitle(teacherMember.School), new List<string>() { teacherMember.MemberId }).GetAwaiter().GetResult();
                 }
             }
             catch (Exception e)
@@ -293,7 +293,7 @@ namespace iread_school_ms.Web.Controller
         [HttpPost("{id}/student/add")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddStudentToSchool([FromBody] StudentDto student, [FromRoute] int id)
+        public IActionResult AddStudentToSchool([FromBody] StudentDto student, [FromRoute] int id)
         {
 
             if (student == null)
@@ -315,11 +315,11 @@ namespace iread_school_ms.Web.Controller
 
             // NOTIFICATION_MS
             // Add student for the first time to notifications ms db.
-            // supscripe to the school topics 
+            // subscribe to the school topics 
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(studentMember.MemberId);
-                TopicSubscribeDto topic = await subscribeToTopic(NotificationUtil.SchoolTopicTitle(studentMember.School), new List<string>() { studentMember.MemberId });
+                AddNotificationUserDto addNotificationUserDto = AddUser(studentMember.MemberId).GetAwaiter().GetResult();
+                TopicSubscribeDto topic = subscribeToTopic(NotificationUtil.SchoolTopicTitle(studentMember.School), new List<string>() { studentMember.MemberId }).GetAwaiter().GetResult();
 
             }
             catch (Exception e)
@@ -410,7 +410,7 @@ namespace iread_school_ms.Web.Controller
         [HttpPost("add")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Post([FromBody] SchoolCreateDto schoolCreateDto)
+        public IActionResult Post([FromBody] SchoolCreateDto schoolCreateDto)
         {
             if (schoolCreateDto == null)
             {
@@ -424,8 +424,8 @@ namespace iread_school_ms.Web.Controller
             // create a topic for the school. 
             try
             {
-                AddTopicDto topic = await CreateTopic(NotificationUtil.SchoolTopicTitle(schoolEntity));
-                AddTopicDto tteachersTopic = await CreateTopic(NotificationUtil.SchoolTeachersTopicTitle(schoolEntity));
+                AddTopicDto topic = CreateTopic(NotificationUtil.SchoolTopicTitle(schoolEntity)).GetAwaiter().GetResult();
+                AddTopicDto teachersTopic = CreateTopic(NotificationUtil.SchoolTeachersTopicTitle(schoolEntity)).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {

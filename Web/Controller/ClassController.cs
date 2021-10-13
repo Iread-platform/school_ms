@@ -70,7 +70,7 @@ namespace iread_school_ms.Web.Controller
 
 
         [HttpPut("{id}/add-student")]
-        public async Task<IActionResult> AddStudent([FromBody] StudentDto student, [FromRoute] int id)
+        public IActionResult AddStudent([FromBody] StudentDto student, [FromRoute] int id)
         {
             if (student == null)
             {
@@ -97,11 +97,11 @@ namespace iread_school_ms.Web.Controller
 
             // NOTIFICATION_MS
             // Add student for the first time to notifications ms db.
-            // supscripe to the class topic. 
+            // subscribe to the class topic. 
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(studentMember.MemberId);
-                TopicSubscribeDto topicSubscribeDto = await subscribeToTopic(NotificationUtil.ClassTopicTitle(studentMember.Class), new List<string>() { studentMember.MemberId });
+                AddNotificationUserDto addNotificationUserDto = AddUser(studentMember.MemberId).GetAwaiter().GetResult();
+                TopicSubscribeDto topicSubscribeDto = subscribeToTopic(NotificationUtil.ClassTopicTitle(studentMember.Class), new List<string>() { studentMember.MemberId }).GetAwaiter().GetResult();
 
             }
             catch (Exception e)
@@ -138,7 +138,7 @@ namespace iread_school_ms.Web.Controller
 
 
         [HttpPut("{id}/add-teacher")]
-        public async Task<IActionResult> AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
+        public IActionResult AddTeacher([FromBody] TeacherDto teacher, [FromRoute] int id)
         {
             if (teacher == null)
             {
@@ -165,11 +165,11 @@ namespace iread_school_ms.Web.Controller
 
             // NOTIFICATION_MS
             // Add teacher for the first time to notifications ms db.
-            // supscripe to the class teacher topic. 
+            // subscribe to the class teacher topic. 
             try
             {
-                AddNotificationUserDto addNotificationUserDto = await AddUser(teacherMember.MemberId);
-                TopicSubscribeDto topicSubscribeDto = await subscribeToTopic(NotificationUtil.ClassTeachersTopicTitle(teacherMember.Class), new List<string>() { teacherMember.MemberId });
+                AddNotificationUserDto addNotificationUserDto = AddUser(teacherMember.MemberId).GetAwaiter().GetResult();
+                TopicSubscribeDto topicSubscribeDto =  subscribeToTopic(NotificationUtil.ClassTeachersTopicTitle(teacherMember.Class), new List<string>() { teacherMember.MemberId }).GetAwaiter().GetResult();
 
             }
             catch (Exception e)
